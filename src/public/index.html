@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="style/index.css">
+    <title>Hello World</title>
+</head>
+
+<body>
+    You are connected
+</body>
+<script>
+    const isLocalhost = window.location.host.indexOf("localhost") == 0;
+    const protocol = isLocalhost ? "ws://" : "wss://";
+
+    const socket = new WebSocket(protocol + window.location.host);
+
+    socket.onclose = () => {
+        location.reload();
+    }
+
+    socket.onopen = () => {
+        let keepaliveCount = 0;
+        setInterval(() => { socket.send("keepalive/" + keepaliveCount++); }, 60 * 1000);
+
+        console.log("connected");
+    }
+</script>
+
+</html>
