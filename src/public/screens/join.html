@@ -1,0 +1,27 @@
+<div>
+    <h1>Enter Room Code</h1>
+    <div id="join-form" class="flex row">
+        <input id="roomcode" type="text">
+        <button class="flex-row" onclick="joinRoom()">JOIN</button>
+    </div>
+</div>
+
+<script>
+    function onJoin(data) {
+        console.log("Joined", data);
+        
+        connection.events.remove("join", onJoin);
+
+        pushScreen("room");
+    }
+
+    connection.events.on("join", onJoin);
+    
+    window.joinRoom = async function () {
+        const roomcode = document.getElementById("roomcode").value;
+        localStorage.setItem("room", roomcode);
+
+
+        connection.send("room.join", roomcode);
+    }
+</script>

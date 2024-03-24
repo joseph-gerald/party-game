@@ -1,0 +1,26 @@
+<div>
+    <div style="display: flex; flex-direction: column; align-items: center;">
+        <div class="lds-heart">
+            <div></div>
+        </div>
+        <h2>202s & Cornflakes</h2>
+    </div>
+</div>
+
+<script>
+    const start = Date.now()
+    connection.send("room.create")
+
+    function onHost(data) {
+        setTimeout(() => {
+            console.log("Hosted", data)
+
+            connection.events.remove("host", onHost)
+            localStorage.setItem("room", data)
+
+            pushScreen("room")
+        }, 600 - (Date.now() - start))
+    }
+
+    connection.events.on("host", onHost)
+</script>

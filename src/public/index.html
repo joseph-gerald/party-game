@@ -5,28 +5,39 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="style/index.css">
+    <link rel="stylesheet" href="style/base.css">
+    <link rel="stylesheet" href="style/effects.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Kumbh Sans:wght@400;500,800&display=swap">
     <title>Hello World</title>
+    <script src="script.js"></script>
+    <script defer src="game.js"></script>
+
+    <link rel="prefetch" href="first.html" />
 </head>
 
 <body>
-    You are connected
+    <div class="screen" id="old">
+
+    </div>
+
+    <div class="screen" id="current">
+
+    </div>
+
+    <div class="screen" id="next">
+
+    </div>
+    
+    <div id="loading-cover">
+        <h1>Loading</h1>
+    </div>
 </body>
 <script>
-    const isLocalhost = window.location.host.indexOf("localhost") == 0;
-    const protocol = isLocalhost ? "ws://" : "wss://";
-
-    const socket = new WebSocket(protocol + window.location.host);
-
-    socket.onclose = () => {
-        location.reload();
-    }
-
-    socket.onopen = () => {
-        let keepaliveCount = 0;
-        setInterval(() => { socket.send("keepalive/" + keepaliveCount++); }, 60 * 1000);
-
-        console.log("connected");
+    window.onload = function() {
+        document.getElementById("loading-cover").classList.add("done")
+        setTimeout(() => {
+            document.getElementById("loading-cover").style.display = "none"
+        }, 600)
     }
 </script>
-
 </html>

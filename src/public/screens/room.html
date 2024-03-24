@@ -1,0 +1,50 @@
+<div>
+    <div style="
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        gap: 30px;
+        background-color: rgba(0,0,0,0.05);
+        border: 1px solid rgba(0,0,0,0.5);
+        padding: 0 30px 0 20px;
+        border-radius: 5px;
+    ">
+        <div>
+            <h1 id="code-tag">LOADING...</h1>
+        </div>
+        <h2 style="margin: 2px; display: flex; align-items: center;">2 Players<div class="lds-ripple">
+                <div></div>
+                <div></div>
+            </div>
+        </h2>
+    </div>
+
+    <div id="player-list">
+        <div class="players">
+        </div>
+    </div>
+</div>
+
+<script>
+    const playerList = document.getElementById("player-list");
+    const codeText = document.getElementById("code-tag");
+    const code = localStorage.getItem("room");
+
+    if (code) {
+        codeText.innerText = `${code}`;
+    } else {
+        codeText.innerText = "No room code found";
+    }
+
+    connection.events.on("room.join", (data) => {
+        const player = document.createElement("player");
+        player.innerText = data;
+        playerList.appendChild(player);
+    });
+</script>
+
+<style>
+    .player-list {
+        display: flex;
+    }
+</style>
