@@ -1,4 +1,4 @@
-const handled_types = ["room.create", "room.join"]
+const handled_types = ["room.create", "room.join","room.players"]
 
 class Room {
     constructor(host) {
@@ -9,9 +9,13 @@ class Room {
         const codeLength = 3;
         this.code = Math.random().toString(36).substring(2, 2 + codeLength).toUpperCase();
     }
+
+    broadcast(type, data) {
+        this.clients.forEach(client => client.send(type, data))
+    }
 }
 
-class RoomHandler {
+module.exports = class {
     constructor(server) {
         this.server = server;
     }
@@ -28,6 +32,7 @@ class RoomHandler {
                     const room = new Room(session)
                     this.server.rooms.push(room);
 
+                    session.room = room;
                     session.send("host", room.code);
                 }
                 break;
@@ -36,20 +41,23 @@ class RoomHandler {
                     const room = this.server.rooms.find(room => room.code == data);
 
                     if (room) {
+                        if (room.clients.find(client => client.id == session.id)) return;
+
                         room.clients.push(session);
 
                         session.send("join", data);
+                        session.room = room;
 
                         room.clients.forEach(client => {
-                            client.send("room.join", session.username);
+                            client.send("room.join", session.profile);
                         });
                     } else {
                         session.send("error", "Room not found");
                     }
                 }
                 break;
+            case "room.players":
+                session.send("room.players", session.room.clients.map(client => client.profile))
         }
     }
-}
-
-module.exports = RoomHandler;
+};

@@ -4,18 +4,17 @@ const protocol = isLocalhost ? "ws://" : "wss://";
 const socket = new WebSocket(protocol + window.location.host);
 
 class Player {
-    constructor(username, avatar_url, id) {
-        this.username = username;
-        this.avatar_url = avatar_url;
-
-        this.id = id;
+    constructor(obj) {
+        for (const [key, value] of Object.entries(obj)) {
+            this[key] = value;
+        }
     }
 }
 
 class Room {
     constructor(connection) {
         this.connection = connection;
-        this.players = []
+        this.players = {}
     }
 }
 
@@ -65,14 +64,24 @@ class Connection {
             const [type, data] = event.data.split("/").map(part => atob(part));
             console.log(type, data);
 
-            this.events.emit(type, data);
+            this.events.emit(type, (() => {
+                try {
+                    return JSON.parse(data)
+                } catch {
+                    return data;
+                }
+            })());
         }
     }
 
     send(type, data) {
-        this.socket.send([type, data].map(part => btoa(part).replaceAll("=", "")).join("/"));
+        this.socket.send([type,typeof data == "object" ? JSON.stringify(data) : data].map(part => btoa(part).replaceAll("=", "")).join("/"));
     }
 }
 
 window.connection = new Connection(socket);
 window.room = new Room(window.connection);
+
+connection.events.on("server.identity", data => {
+    window.player = new Player(data);
+})

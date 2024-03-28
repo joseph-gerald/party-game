@@ -3,13 +3,13 @@
         <div class="lds-heart">
             <div></div>
         </div>
-        <h2>202s & Cornflakes</h2>
+        <h2>202s & Heartbreaks</h2>
     </div>
 </div>
 
 <script>
     const start = Date.now()
-    connection.send("room.create")
+    connection.send("room.create","")
 
     function onHost(data) {
         setTimeout(() => {

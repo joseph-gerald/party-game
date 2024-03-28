@@ -1,4 +1,4 @@
-<div>
+<div style="display: flex; flex-direction: column; gap: 30px;">
     <div style="
         display: flex;
         flex-direction: row;
@@ -12,7 +12,7 @@
         <div>
             <h1 id="code-tag">LOADING...</h1>
         </div>
-        <h2 style="margin: 2px; display: flex; align-items: center;">2 Players<div class="lds-ripple">
+        <h2 style="margin: 2px; display: flex; align-items: center;"><span id="player-count">1 Player</span><div class="lds-ripple">
                 <div></div>
                 <div></div>
             </div>
@@ -20,8 +20,7 @@
     </div>
 
     <div id="player-list">
-        <div class="players">
-        </div>
+
     </div>
 </div>
 
@@ -29,6 +28,48 @@
     const playerList = document.getElementById("player-list");
     const codeText = document.getElementById("code-tag");
     const code = localStorage.getItem("room");
+    const playerCounter = document.getElementById("player-count");
+
+    function updatePlayerCounter() {
+        const playerCount = Object.entries(room.players).length;
+
+        playerCounter.innerHTML = playerCount == 1 ? "1 Player" : `${playerCount} Players`;
+    }
+
+    function addPlayer(player) {
+        const playerElm = document.createElement("player");
+        const avatar = document.createElement("img");
+        const usernameElm = document.createElement("b");
+
+        const isMe = player.id == window.player.id;
+
+        avatar.width = avatar.height = "48";
+        avatar.addEventListener("load", () => { avatar.style.transform = "rotate(0)"; avatar.style.scale = 1 })
+        avatar.classList.add("easeload")
+        playerElm.classList.add("player-avatar")
+
+        usernameElm.innerText = player.username + (isMe ? " ✨" : "");
+        avatar.src = `assets/avatars/${player.avatar_id}.png`;
+
+        if (isMe) {
+            avatar.style.cursor = "pointer";
+            avatar.onclick = () => {
+                if (avatar.style.scale != 0) connection.send("avatar.reroll", "");
+            }
+        } else {
+            avatar.style.cursor = "not-allowed";
+        }
+
+        playerElm.id = "_" + player.id;
+
+        playerElm.append(
+            avatar,
+            usernameElm
+        );
+
+        playerList.appendChild(playerElm);
+        updatePlayerCounter();
+    }
 
     if (code) {
         codeText.innerText = `${code}`;
@@ -36,15 +77,69 @@
         codeText.innerText = "No room code found";
     }
 
-    connection.events.on("room.join", (data) => {
-        const player = document.createElement("player");
-        player.innerText = data;
-        playerList.appendChild(player);
+    connection.events.on("room.disconnect", data => {
+        const player = document.getElementById("_" + data.id);
+
+        player.remove();
+        delete room.players[data.id];
+
+        updatePlayerCounter();
     });
+
+    connection.events.on("room.join", (data) => {
+        const player = new Player(data);
+
+        room.players[player.id] = player;
+
+        addPlayer(player)
+    });
+
+    connection.events.on("room.players", data => {
+        room.players = {};
+        
+        data.forEach(
+            player_data => {
+                const player = new Player(player_data);
+                room.players[player_data.id] = player;
+                addPlayer(player)
+            }
+        );
+    })
+
+    connection.events.on("avatar.update", data => {
+        const avatar = document.querySelector(`#_${data.id} img`);
+        avatar.style.transform = "rotate(90deg)"; avatar.style.scale = 0;
+
+        setTimeout(() => {
+            avatar.src = `assets/avatars/${data.avatar_id}.png`;
+        }, 300)
+    })
+
+    connection.send("room.players", "")
 </script>
 
 <style>
-    .player-list {
+    .player-avatar {
         display: flex;
+        flex-direction: column;
+
+        align-items: center;
+    }
+
+    .player-avatar img {
+        width: 48px;
+    }
+
+    .easeload {
+        scale: 0;
+        transform: rotate(180deg);
+        -webkit-transition: all 0.85s;
+        -moz-transition: all 0.85s;
+    }
+
+    #player-list {
+        display: flex;
+        gap: 30px;
+        justify-content: center;
     }
 </style>
