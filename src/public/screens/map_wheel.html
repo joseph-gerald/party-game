@@ -1,0 +1,130 @@
+<div style="display: flex; flex-direction: column; align-items: center; gap: 25px;">
+    <div id="playing-on-div" style="display: flex; flex-direction: column; align-items: center; gap: 10px; transition: 0.4s;">
+        <h1>Playing on</h1>
+        <img src="assets/arrow down.webp" alt="" width="40px">
+    </div>
+    <div id="wheel">
+
+    </div>
+</div>
+
+
+
+<script>
+    const wheel = document.getElementById("wheel");
+
+    function addWheelItem(image_url, steps) {
+        const figure = document.createElement("figure");
+        figure.innerHTML = `
+            <img src="${image_url}" alt="">
+            <figcaption>${image_url.split("/").pop().split(".")[0]} / ${steps}</figcaption>
+        `;
+
+        wheel.appendChild(figure);
+    }
+
+    function addItems(maps) {
+        wheel.innerHTML = "";
+
+        for (let i = 0; i < 100 * 1.2; i++) {
+            for (const map of maps) {
+                addWheelItem(map.image_url, map.steps);
+            }
+        }
+
+        if (maps.length % 2 == 0) addWheelItem(maps[0].image_url, maps[0].steps);
+    }
+
+    function spinWheel(index) {
+        const wheel = document.getElementById("wheel");
+        const figures = wheel.querySelectorAll("figure");
+
+        const random = index;
+        const figure = figures[random];
+
+        const figureWidth = figure.offsetWidth;
+        const figureX = figureWidth + 40 - figure.getBoundingClientRect().x;
+
+        wheel.style.transition = "transform 3s";
+        wheel.style.transform = `translateX(${figureX + figureWidth * Math.random()}px)`;
+
+        figure.style.zIndex = "50"
+        figure.style.transform = "scale(1) rotate(0deg)"
+        figure.style.transition = "transform 0.65s";
+
+        setTimeout(() => {
+            document.getElementById("playing-on-div").style.opacity = "0";
+
+            figure.style.boxShadow = "0 8px 6px -6px black";
+            figure.style.transform = "scale(2) rotate(360deg)"
+
+            setTimeout(() => {
+                figure.style.transform = "scale(1.5) rotate(360deg)"
+            }, 650)
+        }, 3000);
+    }
+
+    function onSpin(data) {
+        spinWheel(data);
+
+        connection.events.remove("map.spin", onSpin);
+    }
+
+    addItems([
+        {
+            image_url: "assets/maps/sunflower.webp",
+            steps: 12
+        }
+    ])
+
+    connection.events.on("map.spin.prepare", addItems);
+    connection.events.on("map.spin", onSpin);
+</script>
+
+
+
+<style>
+    #wheel {
+        width: 100%;
+        height: 20vh;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
+    #wheel img {
+        width: 100%;
+        height: 100%;
+        object-fit: contain;
+
+        border-radius: 15px;
+    }
+
+    #wheel figure {
+        width: 20vw;
+        height: 100%;
+        object-fit: contain;
+
+        background-color: rgba(0, 0, 0, 0.1);
+        padding: 0 20px 20px 20px;
+        border-radius: 25px;
+
+        position: relative;
+        backdrop-filter: blur(25px);
+    }
+
+    #wheel figcaption {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        right: 0;
+
+        background-color: rgba(0, 0, 0, 0.5);
+        color: white;
+        padding: 10px;
+        border-radius: 0 0 10px 10px;
+
+        text-align: center;
+        font-weight: bold;
+    }
+</style>

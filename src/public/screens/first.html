@@ -1,8 +1,8 @@
 <div>
     <h1>What's your name?</h1>
     <div id="name-form" class="flex row">
-        <input id="username" type="text">
-        <button class="flex-row"
+        <input id="username" type="text" onkeypress="if (event.charCode == 13) set_username_button.click()">
+        <button id="set_username_button" class="flex-row" 
             onclick="localStorage.setItem('username', document.getElementById('username').value); location.reload();">OK</button>
     </div>
 </div>

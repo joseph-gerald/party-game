@@ -5,14 +5,15 @@
         align-items: center;
         gap: 30px;
         background-color: rgba(0,0,0,0.05);
-        border: 1px solid rgba(0,0,0,0.5);
         padding: 0 30px 0 20px;
         border-radius: 5px;
+        justify-content: space-around;
     ">
         <div>
             <h1 id="code-tag">LOADING...</h1>
         </div>
-        <h2 style="margin: 2px; display: flex; align-items: center;"><span id="player-count">1 Player</span><div class="lds-ripple">
+        <h2 style="margin: 2px; display: flex; align-items: center;"><span id="player-count">1 Player</span>
+            <div class="lds-ripple">
                 <div></div>
                 <div></div>
             </div>
@@ -21,6 +22,10 @@
 
     <div id="player-list">
 
+    </div>
+
+    <div>
+        <button id="room-start-button" onclick="connection.send('room.start', '')">Start Game</button>
     </div>
 </div>
 
@@ -44,7 +49,11 @@
         const isMe = player.id == window.player.id;
 
         avatar.width = avatar.height = "48";
-        avatar.addEventListener("load", () => { avatar.style.transform = "rotate(0)"; avatar.style.scale = 1 })
+        avatar.addEventListener("load", () => {
+            setTimeout(() => {
+                avatar.style.transform = "rotate(0)"; avatar.style.scale = 1;
+            }, 50)
+        })
         avatar.classList.add("easeload")
         playerElm.classList.add("player-avatar")
 
@@ -58,6 +67,13 @@
             }
         } else {
             avatar.style.cursor = "not-allowed";
+
+            if (window.player.host) {
+                playerElm.classList.add("kickable");
+                playerElm.onclick = () => {
+                    connection.send("room.kick", player.id);
+                }
+            }
         }
 
         playerElm.id = "_" + player.id;
@@ -83,39 +99,58 @@
         player.remove();
         delete room.players[data.id];
 
-        updatePlayerCounter();
+        if (window.room.status = "idle") updatePlayerCounter();
     });
 
     connection.events.on("room.join", (data) => {
-        const player = new Player(data);
+        const player = new Player(data.profile);
+        window.room.host_id = data.host;
 
         room.players[player.id] = player;
+        if (player.host) window.player = player;
 
-        addPlayer(player)
+        if (window.room.status = "idle") addPlayer(player);
     });
 
     connection.events.on("room.players", data => {
         room.players = {};
-        
+
         data.forEach(
             player_data => {
                 const player = new Player(player_data);
                 room.players[player_data.id] = player;
-                addPlayer(player)
+                if (window.room.status = "idle") addPlayer(player)
+
+                if (player_data.id == room.host_id) {
+                    room.host = player;
+                }
             }
         );
     })
 
     connection.events.on("avatar.update", data => {
+        room.players[data.id].avatar_id = data.avatar_id;
+
+        if (window.room.status != "idle") return;
+
         const avatar = document.querySelector(`#_${data.id} img`);
         avatar.style.transform = "rotate(90deg)"; avatar.style.scale = 0;
+
 
         setTimeout(() => {
             avatar.src = `assets/avatars/${data.avatar_id}.png`;
         }, 300)
-    })
+    });
 
-    connection.send("room.players", "")
+    connection.events.on("room.start", () => {
+        pushScreen("map_wheel");
+    });
+
+    connection.send("room.players", !!window.player.host)
+
+    if (!window.player.host) {
+        document.getElementById("room-start-button").remove();
+    }
 </script>
 
 <style>
@@ -141,5 +176,16 @@
         display: flex;
         gap: 30px;
         justify-content: center;
+
+        width: 400px;
+        flex-wrap: wrap;
+        justify-content: space-evenly;
+    }
+
+    .kickable:hover b {
+        text-decoration: line-through;
+        text-decoration-thickness: 0.3rem;
+        color: red;
+        cursor: pointer;
     }
 </style>

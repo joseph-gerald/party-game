@@ -1,0 +1,12 @@
+<div>
+    <h1>Disconnected</h1>
+    <i id="reason"></i>
+</div>
+
+<script>
+    document.getElementById("reason").innerHTML = window.disconnect_reason;
+
+    setTimeout(() => {
+        location.reload();
+    }, 3000)
+</script>

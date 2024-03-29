@@ -1,9 +1,13 @@
-const handled_types = ["room.create", "room.join","room.players"]
+const handled_types = ["room.create", "room.join", "room.players", "room.kick", "room.start"]
 
 class Room {
-    constructor(host) {
+    constructor(host, server) {
+        this.server = server;
+
         this.clients = [host];
         this.host = host;
+
+        this.state = "idle";
 
         // 36^3 = 46,656 possible codes
         const codeLength = 3;
@@ -12,6 +16,32 @@ class Room {
 
     broadcast(type, data) {
         this.clients.forEach(client => client.send(type, data))
+    }
+
+    kick(id, reason) {
+        const client = this.clients.find(client => client.id == id);
+
+        if (client) {
+            client.send("server.disconnect", reason);
+
+            client.client.close();
+        }
+    }
+
+    close(reason) {
+        this.clients.forEach(client => this.kick(client.id, reason));
+        this.server.rooms.splice(this.server.rooms.indexOf(this), 1);
+    }
+
+    remove(session) {
+        this.clients.splice(this.clients.indexOf(session), 1);
+        this.broadcast("room.disconnect", session.profile);
+
+        if (session == this.host) {
+            if (this.clients.length) {
+                this.close("Host disconnected, room closed")
+            }
+        }
     }
 }
 
@@ -29,11 +59,17 @@ module.exports = class {
         switch (type) {
             case "room.create":
                 {
-                    const room = new Room(session)
+                    const room = new Room(session, this.server)
                     this.server.rooms.push(room);
 
+                    session.host = true;
                     session.room = room;
                     session.send("host", room.code);
+
+                    session.send("room.join", {
+                        profile: session.profile,
+                        host: room.host.id
+                    });
                 }
                 break;
             case "room.join":
@@ -41,6 +77,8 @@ module.exports = class {
                     const room = this.server.rooms.find(room => room.code == data);
 
                     if (room) {
+                        if (room.state != "idle") return session.send("error", "Room is already in progress");
+
                         if (room.clients.find(client => client.id == session.id)) return;
 
                         room.clients.push(session);
@@ -48,8 +86,9 @@ module.exports = class {
                         session.send("join", data);
                         session.room = room;
 
-                        room.clients.forEach(client => {
-                            client.send("room.join", session.profile);
+                        room.broadcast("room.join", {
+                            profile: session.profile,
+                            host: room.host.id
                         });
                     } else {
                         session.send("error", "Room not found");
@@ -57,7 +96,28 @@ module.exports = class {
                 }
                 break;
             case "room.players":
-                session.send("room.players", session.room.clients.map(client => client.profile))
+                if (data == "true") {
+                    session.send("room.join", {
+                        profile: session.profile,
+                        host: session.id
+                    });
+                } else {
+                    session.send("room.players", session.room.clients.map(client => client.profile))
+                }
+                break;
+            case "room.kick":
+                if (!session.host) return session.send("server.error.401", "You are not the host");
+
+                const client = session.room.clients.find(client => client.id == data);
+
+                session.room.kick(data, "You were kicked by the host");
+                break;
+            case "room.start":
+                if (!session.host) return session.send("server.error.401", "You are not the host");
+
+                session.room.state = "playing";
+
+                session.room.broadcast("room.start", "");
         }
     }
 };

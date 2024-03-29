@@ -1,9 +1,11 @@
 const [
     RoomHandler,
-    AvatarHandle
+    AvatarHandle,
+    MapHandler
 ] = [
     require('./handlers/room.js'),
-    require('./handlers/avatar.js')
+    require('./handlers/avatar.js'),
+    require('./handlers/map.js')
 ];
 
 const data = {
@@ -14,7 +16,8 @@ const data = {
 
 let handlers = [
     new RoomHandler(data),
-    new AvatarHandle(data)
+    new AvatarHandle(data),
+    new MapHandler(data)
 ]
 
 class Session {
@@ -45,18 +48,20 @@ function handleConnection(client, request) {
     data.clients.push(client);
     data.sessions.push(session);
 
+    session.onClose = onClose;
+
     function onClose() {
         console.log(`Connection Closed`);
 
         var position = data.clients.indexOf(client);
         data.clients.splice(position, 1);
+        data.sessions.splice(position, 1);
 
         const sessionRoom = session.room;
 
         if (!sessionRoom) return;
 
-        sessionRoom.clients.splice(sessionRoom.clients.indexOf(session))
-        sessionRoom.broadcast("room.disconnect", session.profile)
+        sessionRoom.remove(session);
     }
 
     function onMessage(message) {
@@ -84,7 +89,6 @@ function handleConnection(client, request) {
         for (const handler of handlers) {
             if (handler.handles(type)) {
                 handler.handle(session, type, data);
-                return;
             }
         }
     }

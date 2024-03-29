@@ -8,13 +8,21 @@ class Player {
         for (const [key, value] of Object.entries(obj)) {
             this[key] = value;
         }
+
+        this.host = false;
     }
 }
 
 class Room {
     constructor(connection) {
         this.connection = connection;
-        this.players = {}
+        this.players = {};
+        this.code = "";
+
+        this.host_id = "";
+        this.host = null;
+
+        this.status = "idle";
     }
 }
 
@@ -50,7 +58,7 @@ class Connection {
         this.events = new EventBus();
 
         socket.onclose = () => {
-            location.reload();
+            setTimeout(() => location.reload(), 3000);
         }
 
         socket.onopen = () => {
@@ -85,3 +93,8 @@ window.room = new Room(window.connection);
 connection.events.on("server.identity", data => {
     window.player = new Player(data);
 })
+
+connection.events.on("server.disconnect", data => {
+    window.disconnect_reason = data;
+    pushScreen("disconnected");
+});

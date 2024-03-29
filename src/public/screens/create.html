@@ -9,7 +9,7 @@
 
 <script>
     const start = Date.now()
-    connection.send("room.create","")
+    connection.send("room.create", "")
 
     function onHost(data) {
         setTimeout(() => {
@@ -17,6 +17,7 @@
 
             connection.events.remove("host", onHost)
             localStorage.setItem("room", data)
+            window.player.host = true;
 
             pushScreen("room")
         }, 600 - (Date.now() - start))
