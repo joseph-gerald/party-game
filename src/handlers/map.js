@@ -29,7 +29,10 @@ module.exports = class {
                     session.room.broadcast("map.spin.prepare", JSON.stringify(maps));
 
                     setTimeout(() => {
-                        session.room.broadcast("map.spin", Math.floor(Math.random() * 100 * maps.length));
+                        const index = Math.floor(Math.random() * 100 * maps.length);
+                        const map = maps[index % maps.length];
+                        session.room.broadcast("map.spin", index);
+                        console.log(map)
                     }, 1000);
                 }, 250);
         }

@@ -1,5 +1,6 @@
 <div style="display: flex; flex-direction: column; align-items: center; gap: 25px;">
-    <div id="playing-on-div" style="display: flex; flex-direction: column; align-items: center; gap: 10px; transition: 0.4s;">
+    <div id="playing-on-div"
+        style="display: flex; flex-direction: column; align-items: center; gap: 10px; transition: 0.4s;">
         <h1>Playing on</h1>
         <img src="assets/arrow down.webp" alt="" width="40px">
     </div>
@@ -14,19 +15,23 @@
     const wheel = document.getElementById("wheel");
 
     function addWheelItem(image_url, steps) {
+        const div = document.createElement("div");
         const figure = document.createElement("figure");
+
         figure.innerHTML = `
             <img src="${image_url}" alt="">
             <figcaption>${image_url.split("/").pop().split(".")[0]} / ${steps}</figcaption>
         `;
 
-        wheel.appendChild(figure);
+        div.appendChild(figure);
+
+        wheel.appendChild(div);
     }
 
     function addItems(maps) {
         wheel.innerHTML = "";
 
-        for (let i = 0; i < 100 * 1.2; i++) {
+        for (let i = 0; i < 100 * 1.5; i++) {
             for (const map of maps) {
                 addWheelItem(map.image_url, map.steps);
             }
@@ -46,21 +51,23 @@
         const figureX = figureWidth + 40 - figure.getBoundingClientRect().x;
 
         wheel.style.transition = "transform 3s";
-        wheel.style.transform = `translateX(${figureX + figureWidth * Math.random()}px)`;
+        wheel.style.transform = `translateX(${figureX + figureWidth}px)`;
 
+        figure.parentElement.style.zIndex = "50";
         figure.style.zIndex = "50"
         figure.style.transform = "scale(1) rotate(0deg)"
-        figure.style.transition = "transform 0.65s";
+        figure.style.transition = "transform 0.5s";
 
         setTimeout(() => {
             document.getElementById("playing-on-div").style.opacity = "0";
 
-            figure.style.boxShadow = "0 8px 6px -6px black";
-            figure.style.transform = "scale(2) rotate(360deg)"
+            figure.style.boxShadow = "0 18px 36px -6px black";
+            figure.style.transform = "scale(1.8) rotateX(3deg)"
 
             setTimeout(() => {
-                figure.style.transform = "scale(1.5) rotate(360deg)"
-            }, 650)
+                figure.style.transition = "transform 0.75s";
+                figure.style.transform = "scale(1.25)"
+            }, 750)
         }, 3000);
     }
 
@@ -86,34 +93,41 @@
 <style>
     #wheel {
         width: 100%;
-        height: 20vh;
+        height: 22.5vh;
         display: flex;
         justify-content: center;
         align-items: center;
     }
 
+    #wheel div {
+        height: 100%;
+        perspective: 100px;
+    }
+
     #wheel img {
         width: 100%;
-        height: 100%;
+
         object-fit: contain;
 
         border-radius: 15px;
     }
 
-    #wheel figure {
+    #wheel div figure {
         width: 20vw;
         height: 100%;
         object-fit: contain;
 
         background-color: rgba(0, 0, 0, 0.1);
-        padding: 0 20px 20px 20px;
+        padding: 20px;
         border-radius: 25px;
 
         position: relative;
         backdrop-filter: blur(25px);
+
+        display: flex;
     }
 
-    #wheel figcaption {
+    #wheel div figcaption {
         position: absolute;
         bottom: 0;
         left: 0;
@@ -126,5 +140,7 @@
 
         text-align: center;
         font-weight: bold;
+
+        backdrop-filter: blur(25px);
     }
 </style>
