@@ -2,7 +2,43 @@ const old = document.getElementById("old");
 const current = document.getElementById("current");
 const next = document.getElementById("next");
 
+const notifications = document.querySelector(".notification-container");
+
 let username = localStorage.getItem("username");
+
+const Sounds = {
+    whoosh: new Audio("assets/audio/whoosh.mp3"),
+    wheel_spin: new Audio("assets/audio/wheel_spin.mp3"),
+}
+
+function notify(title, message, duration=2500, classes=[]) {
+    const notification = document.createElement("notification");
+    notification.innerHTML = `
+        <h3 id="title">${title}</h3>
+        <p id="message">${message}</p>
+    `;
+
+    notifications.appendChild(notification);
+
+    console.log(classes);
+    classes.forEach(klass => notification.classList.add(klass));
+
+    setTimeout(() => {
+        notification.classList.add("expired");
+
+        setTimeout(_ => {
+            notification.remove();
+        }, 1000);
+    }, duration);
+}
+
+function playSound(sound, playbackRate = 1, volume = 1) {
+    const audio = sound.cloneNode();
+    audio.mozPreservesPitch = false;
+    audio.playbackRate = playbackRate;
+    audio.volume = volume;
+    audio.play();
+}
 
 async function getScreen(screen) {
     return fetch("screens/" + screen + ".html").then((res) => res.text());
@@ -22,6 +58,8 @@ function pushHTML(screen) {
     if (script) {
         eval(script.innerHTML);
     }
+
+    playSound(Sounds.whoosh, 1.2 + Math.random() * 0.4, 0.5 + Math.random() * 0.3);
 
     setTimeout(() => {
         next.style.transitionDuration = "0.4s";
@@ -49,3 +87,4 @@ async function init() {
 }
 
 init();
+window.Sounds = Sounds;

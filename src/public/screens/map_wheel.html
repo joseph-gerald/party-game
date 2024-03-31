@@ -12,32 +12,39 @@
 
 
 <script>
+    let maps = [];
     const wheel = document.getElementById("wheel");
 
-    function addWheelItem(image_url, steps) {
+    function addWheelItem(map) {
         const figure = document.createElement("figure");
 
         figure.innerHTML = `
-            <img src="${image_url}" alt="">
-            <figcaption>${image_url.split("/").pop().split(".")[0]} / ${steps}</figcaption>
+            <img src="${map.image_url}" alt="">
+            <figcaption>${map.name} / ${map.steps}</figcaption>
         `;
 
         wheel.appendChild(figure);
     }
 
-    function addItems(maps) {
+    function addItems(map_array) {
+        maps = map_array;
+
         wheel.innerHTML = "";
 
         for (let i = 0; i < 100 * 1.5; i++) {
-            for (const map of maps) {
-                addWheelItem(map.image_url, map.steps);
+            for (const [index, map] of Object.entries(maps)) {
+                addWheelItem(map);
             }
         }
 
-        if (maps.length % 2 == 0) addWheelItem(maps[0].image_url, maps[0].steps);
+        addWheelItem(maps[0].image_url, maps[0].steps);
     }
 
     function spinWheel(index) {
+        const spinDuration = isLocalhost ? 50 : 6000; // ms
+
+        if (!isLocalhost) window.Sounds.wheel_spin.play();
+
         const wheel = document.getElementById("wheel");
         const figures = wheel.querySelectorAll("figure");
 
@@ -47,9 +54,9 @@
         const isMobile = window.outerWidth < 800;
         const figureWidth = figure.offsetWidth;
 
-        const figureX = (isMobile ? -figureWidth * 0.5 - 40 : 80 + figureWidth * Math.random()) - figure.getBoundingClientRect().x;
+        const figureX = (isMobile ? -figureWidth * 0.5 - 40 : figureWidth * 0.5 - 40 - 10 + figureWidth * Math.random()) - figure.getBoundingClientRect().x;
 
-        wheel.style.transition = "transform 6s ease-out";
+        wheel.style.transition = `transform ${spinDuration}ms ease-out`;
         wheel.style.transform = `translateX(${figureX + figureWidth}px)`;
 
         figure.parentElement.style.zIndex = "50";
@@ -63,11 +70,20 @@
             figure.style.boxShadow = "0 18px 36px -6px black";
             figure.style.transform = "scale(2) rotate(360deg)"
 
+            window.notify("Map", `Selected ${figure.querySelector("figcaption").innerText.split(" /")[0]}, preparing map...`, 5000, ["success"]);
+
             setTimeout(() => {
                 figure.style.transition = "transform 0.75s";
                 figure.style.transform = "scale(1.5) rotate(360deg)"
-            }, 750)
-        }, 6200);
+
+                const map = maps[random % maps.length];
+                window.room.map = map;
+
+                setTimeout(() => {
+                    pushScreen("map");
+                }, 750)
+            }, 900)
+        }, spinDuration + 200);
     }
 
     function onSpin(data) {
@@ -93,6 +109,7 @@
     #wheel {
         width: 100%;
         height: 22.5vh;
+
         display: flex;
         justify-content: center;
         align-items: center;
@@ -115,8 +132,8 @@
         object-fit: contain;
 
         background-color: rgba(0, 0, 0, 0.1);
-        padding: 20px;
-        border-radius: 25px;
+        padding: 10px;
+        border-radius: 20px;
 
         position: relative;
         backdrop-filter: blur(25px);
@@ -134,7 +151,7 @@
         background-color: rgba(0, 0, 0, 0.5);
         color: white;
         padding: 10px;
-        border-radius: 0 0 25px 25px;
+        border-radius: 0 0 20px 20px;
 
         text-align: center;
         font-weight: bold;

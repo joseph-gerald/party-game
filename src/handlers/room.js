@@ -8,6 +8,7 @@ class Room {
         this.host = host;
 
         this.state = "idle";
+        this.map = null;
 
         // 36^3 = 46,656 possible codes
         const codeLength = 3;
@@ -77,7 +78,10 @@ module.exports = class {
                     const room = this.server.rooms.find(room => room.code == data);
 
                     if (room) {
-                        if (room.state != "idle") return session.send("error", "Room is already in progress");
+                        if (room.state != "idle") return session.send("error", {
+                            title: "Room started",
+                            message: "Room is already in progress 😔"
+                        });
 
                         if (room.clients.find(client => client.id == session.id)) return;
 
@@ -91,7 +95,10 @@ module.exports = class {
                             host: room.host.id
                         });
                     } else {
-                        session.send("error", "Room not found");
+                        session.send("error", {
+                            title: "Room not found",
+                            message: `Could not find a room with code: ${data}`
+                        });
                     }
                 }
                 break;

@@ -1,3 +1,7 @@
+<head>
+    <link rel="prefetch" href="screens/map_wheel.html" />
+</head>
+
 <div style="display: flex; flex-direction: column; gap: 30px;">
     <div style="
         display: flex;
@@ -99,6 +103,8 @@
         player.remove();
         delete room.players[data.id];
 
+        window.notify("Player Left", `${data.username} left the room`);
+        
         if (window.room.status = "idle") updatePlayerCounter();
     });
 
@@ -107,7 +113,9 @@
         window.room.host_id = data.host;
 
         room.players[player.id] = player;
-        if (player.host) window.player = player;
+
+        if (player.id == window.player.id) window.player = player;
+        else window.notify("Player Joined", `${player.username} joined the room`);
 
         if (window.room.status = "idle") addPlayer(player);
     });
@@ -143,6 +151,7 @@
     });
 
     connection.events.on("room.start", () => {
+        window.notify("Game Started", "The game has started, rolling in 2s", 2250, ["important"]);
         pushScreen("map_wheel");
     });
 

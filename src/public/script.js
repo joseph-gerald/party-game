@@ -3,6 +3,14 @@ const protocol = isLocalhost ? "ws://" : "wss://";
 
 const socket = new WebSocket(protocol + window.location.host);
 
+function encode(string) {
+    return btoa(encodeURI(string));
+}
+
+function decode(string) {
+    return decodeURI(atob(string));
+}
+
 class Player {
     constructor(obj) {
         for (const [key, value] of Object.entries(obj)) {
@@ -23,6 +31,7 @@ class Room {
         this.host = null;
 
         this.status = "idle";
+        this.map = null;
     }
 }
 
@@ -56,20 +65,42 @@ class Connection {
     constructor(socket) {
         this.socket = socket;
         this.events = new EventBus();
+        this.pings = {};
+        this.ping = -1;
+        this.keepalive = 0;
+        this.ping_history = [];
+        this.lagging = false;
 
         socket.onclose = () => {
             setTimeout(() => location.reload(), 3000);
         }
 
         socket.onopen = () => {
-            let keepaliveCount = 0;
-            setInterval(() => { socket.send("keepalive/" + keepaliveCount++); }, 60 * 1000);
-        
+            setInterval(() => {
+                this.sendPing();
+            }, (isLocalhost ? 30 : 1) * 1000);
+
             window.connected = true;
+            this.sendPing();
         }
 
         this.socket.onmessage = (event) => {
-            const [type, data] = event.data.split("/").map(part => atob(part));
+            const message = event.data;
+
+            if (message.indexOf("PONG") == 0) {
+                const count = parseInt(atob(message.split("/")[1]));
+    
+                const ping = Date.now() - this.pings[count];
+                delete this.pings[count];
+
+                this.ping = ping;
+                
+                this.ping_history.push(ping);
+                this.ping_history = this.ping_history.slice(-100);
+                return;
+            }
+
+            const [type, data] = message.split("/").map(part => decode(part));
             console.log(type, data);
 
             this.events.emit(type, (() => {
@@ -83,7 +114,18 @@ class Connection {
     }
 
     send(type, data) {
-        this.socket.send([type,typeof data == "object" ? JSON.stringify(data) : data].map(part => btoa(part).replaceAll("=", "")).join("/"));
+        console.log(this)
+        this.socket.send([type, typeof data == "object" ? JSON.stringify(data) : data].map(part => encode(part).replaceAll("=", "")).join("/"));
+    }
+
+    sendPing() {
+        const count = this.keepalive++;
+        this.socket.send("PING/" + btoa(count).replaceAll("=", ""));
+
+        if (this.ping_history.reduce((a, b) => a + b, 0) / this.ping_history.length < 300) this.lagging = false;
+        if (Object.keys(this.pings).length > 0) this.lagging = true;
+
+        this.pings[count] = Date.now();
     }
 }
 
@@ -97,4 +139,8 @@ connection.events.on("server.identity", data => {
 connection.events.on("server.disconnect", data => {
     window.disconnect_reason = data;
     pushScreen("disconnected");
+});
+
+connection.events.on("error", data => {
+    window.notify(data.title, data.message, 5000, ["warning"]);
 });

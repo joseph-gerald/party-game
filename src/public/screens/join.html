@@ -10,8 +10,9 @@
     roomcode.focus()
 
     function onJoin(data) {
+        window.notify("Joined", "Sucesfully joined " + data, 2000, ["success"]);
         console.log("Joined", data);
-        
+
         connection.events.remove("join", onJoin);
 
         pushScreen("room");
@@ -22,7 +23,6 @@
     window.joinRoom = async function () {
         const roomcode = document.getElementById("roomcode").value.toUpperCase();
         localStorage.setItem("room", roomcode);
-
 
         connection.send("room.join", roomcode);
     }

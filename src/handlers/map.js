@@ -3,11 +3,13 @@ const handled_types = ["room.start"]
 maps = [
     {
         image_url: "assets/maps/sunflower.webp",
-        steps: 12
-    },
-    {
-        image_url: "assets/maps/fortnite.jpg",
-        steps: 40
+        step_map: "data/maps/sunflower.json",
+        name: "Sunflower",
+        steps: 12,
+        dice: {
+            min: 1,
+            max: 3
+        }
     }
 ]
 
@@ -29,8 +31,17 @@ module.exports = class {
                     session.room.broadcast("map.spin.prepare", JSON.stringify(maps));
 
                     setTimeout(() => {
-                        const index = Math.floor(Math.random() * 100 * maps.length);
+                        const noGo = 100 * 1.5 * maps.length * 0.5;
+                        const range = 60;
+
+                        let index = noGo;
+
+                        while (Math.abs(index - noGo) < range) {
+                            index = Math.floor(Math.random() * 100 * maps.length);
+                        }
+
                         const map = maps[index % maps.length];
+
                         session.room.broadcast("map.spin", index);
                         console.log(map)
                     }, 1000);

@@ -22,6 +22,18 @@
 <br>
 <br>
 
+![image](https://github.com/joseph-gerald/party-game/assets/73967013/b29b5278-6e87-41c2-a7e1-12f4cab6fa8d)
+- [ ] 📖 Trivia
+- [ ] 🧠 Memory Game
+- [ ] 🖱️ Clicking (e.g Tug of war) / Timing games (e.g wack a mole)
+- [ ] 💣 Hot Potato
+- [ ] 🤏 Sorting Game
+- [ ] ☄️ Comet Dodge
+- [ ] 🥷🏿 Parkour/Obby
+- [ ] 🧱 Stacking Game
+- [ ] 🎶 Music Geussing
+<br>
+
 ![image](https://github.com/joseph-gerald/party-game/assets/73967013/f1b38750-6e93-400b-8608-f4ff09efbfb6)
 - 🚀 Low overhead and fast response times using websockets
 - ⚡ Performant client

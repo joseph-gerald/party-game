@@ -4,6 +4,16 @@
     --primary: 109, 117, 151;
     --secondary: 180, 193, 201;
     --accent: 139, 155, 173;
+
+    /*
+    primary: #32ba4e;
+    secondary: #b4c1c9;
+    accent: #8b9bad;
+    */
+
+    --primaryc: rgb(var(--primary));
+    --secondaryc: rgb(var(--secondary));
+    --accentc: rgb(var(--accent));
 }
 
 body {
@@ -55,7 +65,7 @@ input {
 
     outline: none;
     font-family: inherit;
-    
+
     transition-duration: 150ms;
 }
 
@@ -75,4 +85,62 @@ button {
 
 h1 {
     margin: 0;
+}
+
+/* notifications */
+
+.notification-container {
+    right: 10px;
+    bottom: 10px;
+    position: fixed;
+    z-index: 1000;
+}
+
+notification {
+    min-width: 200px;
+
+    display: flex;
+    flex-direction: column;
+
+    background-color: rgba(0, 0, 0, 0.15);
+    border: 1px solid rgba(0, 0, 0, 0.25);
+    backdrop-filter: blur(35px);
+
+    border-left: 5px solid var(--primaryc);
+
+    padding: 7px;
+    border-radius: 5px;
+    margin-top: 10px;
+
+    animation: notification-in 0.75s;
+
+    transition-duration: 500ms;
+}
+
+notification #title {
+    margin: 0;
+}
+
+notification #message {
+    margin: 0;
+}
+
+notification.expired {
+    opacity: 0;
+
+    transform: translateY(25%);
+    filter: blur(5px);
+    scale: .85;
+}
+
+notification.warning {
+    border-left: 5px solid #ff2f2fc0;
+}
+
+notification.success {
+    border-left: 5px solid #32ba4ec0;
+}
+
+notification.important {
+    border-left: 5px solid #bd2fffc0;
 }

@@ -1,3 +1,230 @@
-<div>
-    
+<div style="
+    width: 100%;
+    height: 100%; 
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+">
+    <div class="map">
+        <img id="map-img" src="" alt="">
+
+        <div class="players">
+        </div>
+    </div>
+
+    <div class="loading-bar-parent" style="
+        width: 100vw;
+        padding: 25px 0;
+        display: flex;
+
+        justify-content: center;
+        align-items: center;
+
+        position: absolute;
+        top: 50%;
+        left: 0;
+
+        transform: translateY(-50%);
+
+        background-color: #191919;
+        backdrop-filter: blur(20px);
+
+        color: var(--background);
+        transition: 0.3s ease-out;
+    ">
+        <div class="lds-facebook">
+            <div></div>
+            <div></div>
+            <div></div>
+        </div>
+        <h1 id="loading-bar-text"></h1>
+    </div>
 </div>
+
+<script>
+    const mapImg = document.getElementById("map-img");
+    const mapElm = document.querySelector(".map")
+    const map = window.room.map;
+    let steps = [];
+
+    const loadingBarParent = document.querySelector(".loading-bar-parent");
+    const loadingBarText = document.getElementById("loading-bar-text");
+
+    const playersElm = document.querySelector(".players");
+
+    mapImg.src = map.image_url;
+
+    function showText(text) {
+        loadingBarParent.style.height = "auto";
+        loadingBarText.innerText = text;
+        loadingBarText.style.transform = "none";
+
+        loadingBarText.style.scale = "1";
+        loadingBarParent.style.padding = "25px 0";
+    }
+
+    function hideText() {
+        loadingBarText.style.transition = ".5s";
+        loadingBarText.style.transform = "translateX(calc(-50vw - 100%))"
+        loadingBarParent.style.height = loadingBarParent.offsetHeight - 50 + "px";
+
+        setTimeout(() => {
+            loadingBarParent.style.padding = "0";
+            loadingBarParent.style.height = "0";
+
+            setTimeout(() => {
+                loadingBarText.innerText = "";
+            }, 500);
+        }, 300)
+    }
+
+    window.hideText = hideText;
+    window.showText = showText;
+
+    function onLoad() {
+        const loadingBar = document.querySelector(".lds-facebook");
+
+        loadingBar.style.transition = ".35s ease-out";
+        loadingBar.style.transform = "translateX(calc(-50vw - 100%))"
+
+        setTimeout(() => {
+            loadingBarParent.style.padding = "0";
+
+            loadingBar.style.height = "0";
+            loadingBar.style.overflow = "hidden";
+
+            setTimeout(() => {
+                loadingBar.remove();
+                mapElm.style.filter = "none";
+            }, 500)
+        }, 200)
+
+        hideText();
+    }
+
+    function syncPositions() {
+        const players = Object.values(window.room.players);
+
+        steps.forEach(step => {
+            step.xOffset = 0;
+            step.players = 0;
+            step.playersMax = players.filter(player => player.step == steps.indexOf(step)).length;
+        });
+
+        players.forEach(player => {
+            const step = steps[player.step];
+            const playerElm = player.mapElm;
+            const playerWidth = playerElm.offsetWidth;
+
+            const [x, y] = [
+                step.x,
+                step.y
+            ]
+
+            step.players++;
+            step.xOffset += 10; // playerWidth - 20;
+
+            playerElm.style.left = `calc(${x}% + ${step.players == 0 ? 0 : step.xOffset - (step.playersMax * 10 / 2)}px)`;
+            playerElm.style.top = `calc(${y}% + ${step.players * 5 - step.playersMax * 5}px)`;
+        });
+    }
+
+    window.syncPositions = syncPositions;
+
+    function loadPlayers() {
+        const players = Object.values(window.room.players);
+
+        players.forEach(player => {
+            const playerElm = document.createElement("player");
+            const avatar = document.createElement("img");
+            const usernameElm = document.createElement("b");
+
+            const isMe = player.id == window.player.id;
+
+            playerElm.id = player.id;
+
+            avatar.width = avatar.height = "48";
+            avatar.src = `assets/avatars/${player.avatar_id}.png`;
+
+            if (isMe) playerElm.style.background = "lightgoldenrodyellow";
+
+            usernameElm.innerText = player.username;
+
+            playerElm.appendChild(avatar);
+            playerElm.appendChild(usernameElm);
+
+            playersElm.appendChild(playerElm);
+
+            player.mapElm = playerElm;
+        });
+
+        syncPositions();
+    }
+
+    async function load() {
+        const response = await fetch(map.step_map);
+        const json = await response.json();
+
+        const dimensions = json["dimensions"];
+
+        room.map.steps = steps = json["steps"].map(step => {
+            return {
+                x: step.x / dimensions.width * 100,
+                y: step.y / dimensions.height * 100
+            }
+        });
+
+        loadPlayers();
+
+        setTimeout(() => {
+            onLoad();
+        }, 500)
+    }
+
+    load();
+</script>
+
+<style>
+    .map {
+        position: relative;
+
+        width: fit-content;
+        height: fit-content;
+
+        transition: 1s;
+        filter: blur(20px);
+    }
+
+    #map-img {
+        width: 100%;
+        max-height: 100%;
+        object-fit: contain;
+
+        user-select: none;
+    }
+
+    .players player {
+        position: absolute;
+
+        display: flex;
+        flex-direction: column;
+
+        align-items: center;
+
+        border: #191919 1px solid;
+
+        background: var(--background);
+        border-radius: 4px;
+        padding: 3px 10px 5px 10px;
+
+        transform: translate(-50%, -100%);
+        transition-duration: 0.5s;
+    }
+
+    .players player:hover {
+        z-index: 50;
+        transform: translate(-45%, -95%);
+        scale: 1.1;
+    }
+</style>

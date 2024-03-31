@@ -3,10 +3,10 @@ const [
     AvatarHandle,
     MapHandler
 ] = [
-    require('./handlers/room.js'),
-    require('./handlers/avatar.js'),
-    require('./handlers/map.js')
-];
+        require('./handlers/room.js'),
+        require('./handlers/avatar.js'),
+        require('./handlers/map.js')
+    ];
 
 const data = {
     sessions: [],
@@ -19,6 +19,14 @@ let handlers = [
     new AvatarHandle(data),
     new MapHandler(data)
 ]
+
+function encode(string) {
+    return btoa(encodeURI(string));
+}
+
+function decode(string) {
+    return decodeURI(atob(string));
+}
 
 class Session {
     constructor(client) {
@@ -37,7 +45,16 @@ class Session {
     }
 
     send(type, data) {
-        this.client.send([type, typeof data == "object" ? JSON.stringify(data) : data].map(part => btoa(part).replaceAll("=", "")).join("/"));
+        try {
+            this.client.send([type, typeof data == "object" ? JSON.stringify(data) : data].map(part => encode(part).replaceAll("=", "")).join("/"));
+        } catch (error) {
+            console.log(error);
+
+            this.send("error", {
+                title: "Encoder Error",
+                message: "Something went wrong when encoding your message. Please report EN01."
+            })
+        }
     }
 }
 
@@ -65,14 +82,15 @@ function handleConnection(client, request) {
     }
 
     function onMessage(message) {
-        if (message.indexOf("keepalive") == 0) {
-            const count = message.split("/")[1];
+        if (message.indexOf("PING") == 0) {
+            const count = parseInt(atob(message.split("/")[1]));
 
-            if (isNaN(parseInt(count)) || count < session.keepalive) {
+            if (isNaN(count) || count < session.keepalive) {
                 client.terminate();
             }
 
             session.keepalive = count;
+            session.client.send("PONG/"+btoa(count).replaceAll("=",""));
             return;
         }
 
@@ -82,14 +100,31 @@ function handleConnection(client, request) {
             return;
         }
 
-        let [type, data] = message.split("/").map(part => atob(part));
+        try {
+            let [type, data] = message.split("/").map(part => decode(part));
 
-        console.log(`Received: ${type} ${data}`);
+            console.log(`Received: ${type} ${data}`);
 
-        for (const handler of handlers) {
-            if (handler.handles(type)) {
-                handler.handle(session, type, data);
+
+            try {
+                for (const handler of handlers) {
+                    if (handler.handles(type)) {
+                        handler.handle(session, type, data);
+                    }
+                }
+            } catch (error) {
+                console.log(error);
+                session.send("error", {
+                    title: "Internal Server Error",
+                    message: "Something went wrong on our end, please report EH01."
+                })
             }
+        } catch (error) {
+            console.log(error);
+            session.send("error", {
+                title: "Decoder Error",
+                message: "Something went wrong when decoding your message. Please report DE01."
+            })
         }
     }
 
