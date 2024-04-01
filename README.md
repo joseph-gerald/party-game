@@ -15,7 +15,7 @@
 </p>
 
 <p align="center">
-  Fun, intuitive and blazingly fast online party game
+  Fun, intuitive and lightning fast online party game
 </p>
 
 <br>
@@ -54,3 +54,10 @@ $ npm i
 $ npm run dev
 ```
 
+<br>
+<br>
+
+#### Credits
+[Dadik / Avatars](https://dadik.lol/)
+<br>
+[CrazyTim / spin-wheel](https://github.com/CrazyTim/spin-wheel)

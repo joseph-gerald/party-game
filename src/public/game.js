@@ -2,6 +2,8 @@ const old = document.getElementById("old");
 const current = document.getElementById("current");
 const next = document.getElementById("next");
 
+const popup = document.getElementById("popup");
+
 const notifications = document.querySelector(".notification-container");
 
 let username = localStorage.getItem("username");
@@ -20,7 +22,6 @@ function notify(title, message, duration=2500, classes=[]) {
 
     notifications.appendChild(notification);
 
-    console.log(classes);
     classes.forEach(klass => notification.classList.add(klass));
 
     setTimeout(() => {
@@ -84,6 +85,21 @@ async function init() {
         pushScreen("options");
         connection.socket.send(username);
     }
+}
+
+function showPopup() {
+    popup.style.zIndex = "auto";
+    popup.style.height = "auto";
+    popup.style.padding = "25px 0";
+}
+
+function hidePopup() {
+    popup.style.height = popup.offsetHeight - 50 + "px";
+
+    setTimeout(() => {
+        popup.style.padding = "0";
+        popup.style.height = "0";
+    }, 300)
 }
 
 init();

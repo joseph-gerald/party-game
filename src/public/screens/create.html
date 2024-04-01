@@ -9,11 +9,11 @@
 
 <script>
     const start = Date.now()
-    connection.send("room.create", "")
+    connection.send("room.create")
 
     function onHost(data) {
         setTimeout(() => {
-            console.log("Hosted", data)
+            //console.log("Hosted", data)
 
             connection.events.remove("host", onHost)
             localStorage.setItem("room", data)

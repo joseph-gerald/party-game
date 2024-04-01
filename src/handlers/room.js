@@ -10,6 +10,8 @@ class Room {
         this.state = "idle";
         this.map = null;
 
+        this.game = null;
+
         // 36^3 = 46,656 possible codes
         const codeLength = 3;
         this.code = Math.random().toString(36).substring(2, 2 + codeLength).toUpperCase();

@@ -1,11 +1,13 @@
 const [
     RoomHandler,
     AvatarHandle,
-    MapHandler
+    MapHandler,
+    GameHandler
 ] = [
         require('./handlers/room.js'),
         require('./handlers/avatar.js'),
-        require('./handlers/map.js')
+        require('./handlers/map.js'),
+        require('./handlers/game.js')
     ];
 
 const data = {
@@ -17,7 +19,8 @@ const data = {
 let handlers = [
     new RoomHandler(data),
     new AvatarHandle(data),
-    new MapHandler(data)
+    new MapHandler(data),
+    new GameHandler(data)
 ]
 
 function encode(string) {
@@ -35,6 +38,8 @@ class Session {
         this.username = null;
         this.keepalive = 0;
         this.room = null;
+
+        this.gameReady = 0;
 
         this.profile = {
             id: this.id,
@@ -90,7 +95,7 @@ function handleConnection(client, request) {
             }
 
             session.keepalive = count;
-            session.client.send("PONG/"+btoa(count).replaceAll("=",""));
+            session.client.send("PONG/" + btoa(count).replaceAll("=", ""));
             return;
         }
 

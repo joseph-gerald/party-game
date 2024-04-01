@@ -23,7 +23,6 @@ module.exports = class {
     }
 
     handle(session, type, data) {
-        console.log("ASDAISDOJAOISDJ")
         switch (type) {
             case "room.start":
                 if (!session.host) return session.send("server.error.401", "You are not the host");

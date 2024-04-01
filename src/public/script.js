@@ -3,6 +3,8 @@ const protocol = isLocalhost ? "ws://" : "wss://";
 
 const socket = new WebSocket(protocol + window.location.host);
 
+const sleep = ms => new Promise(r => setTimeout(r, ms));
+
 function encode(string) {
     return btoa(encodeURI(string));
 }
@@ -101,7 +103,7 @@ class Connection {
             }
 
             const [type, data] = message.split("/").map(part => decode(part));
-            console.log(type, data);
+            console.log("INCOMING", type, data);
 
             this.events.emit(type, (() => {
                 try {
@@ -113,8 +115,7 @@ class Connection {
         }
     }
 
-    send(type, data) {
-        console.log(this)
+    send(type, data = "") {
         this.socket.send([type, typeof data == "object" ? JSON.stringify(data) : data].map(part => encode(part).replaceAll("=", "")).join("/"));
     }
 
@@ -137,6 +138,8 @@ connection.events.on("server.identity", data => {
 })
 
 connection.events.on("server.disconnect", data => {
+    clearPopup();
+
     window.disconnect_reason = data;
     pushScreen("disconnected");
 });

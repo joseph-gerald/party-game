@@ -1,0 +1,63 @@
+<div class="wheel-container">
+</div>
+
+<script>
+    const props = {
+        isInteractive: false,
+        itemLabelFont: 'Arial',
+        itemLabelRadius: 0.93,
+        itemLabelRadiusMax: 0.35,
+        itemLabelRotation: 180,
+        itemLabelAlign: "left",
+        itemLabelColors: ['#fff'],
+        itemLabelBaselineOffset: -0.07,
+        itemLabelFontSizeMax: 55,
+        borderColor: 'transparent',
+        itemBackgroundColors: ['#ffc93c', '#66bfbf', '#a2d5f2', '#515070', '#43658b', '#ed6663', '#d54062'],
+        rotationSpeedMax: 500,
+        rotationResistance: -100,
+        lineWidth: 1,
+        items: window.room.games.map(game => {
+            game.imageScale = 0.3
+            return game;
+        })
+    }
+
+    const container = document.querySelector('.wheel-container');
+
+    const wheel = new spinWheel.Wheel(container, props);
+
+    const winningItemIndex = window.room.game_index;
+    const duration = 6000;
+
+    wheel.spinToItem(winningItemIndex, duration, true, 15, 1, easing.cubicOut)
+
+    setTimeout(async () => {
+        showText(`${window.room.games[winningItemIndex].name}`);
+    }, duration - 500)
+</script>
+
+<style>
+    .wheel-container {
+        width: 80%;
+        height: 80%;
+        overflow: hidden;
+
+        position: relative;
+    }
+
+    .wheel-container:after {
+        position: absolute;
+        content: '';
+        width: 32px;
+        height: 32px;
+
+        background: url('assets/arrow down.webp') no-repeat;
+        background-size: 32px;
+
+        right: 50%;
+        top: 0;
+
+        transform: translate(50%, -50%);
+    }
+</style>

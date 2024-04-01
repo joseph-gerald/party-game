@@ -67,7 +67,7 @@
         if (isMe) {
             avatar.style.cursor = "pointer";
             avatar.onclick = () => {
-                if (avatar.style.scale != 0) connection.send("avatar.reroll", "");
+                if (avatar.style.scale != 0) connection.send("avatar.reroll");
             }
         } else {
             avatar.style.cursor = "not-allowed";
@@ -127,7 +127,9 @@
             player_data => {
                 const player = new Player(player_data);
                 room.players[player_data.id] = player;
+
                 if (window.room.status = "idle") addPlayer(player)
+                if (player_data.id == window.player.id) window.player = player;
 
                 if (player_data.id == room.host_id) {
                     room.host = player;

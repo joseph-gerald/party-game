@@ -8,20 +8,17 @@
     <link rel="stylesheet" href="style/base.css">
     <link rel="stylesheet" href="style/effects.css">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Kumbh Sans:wght@400;500,800&display=swap">
-    
     <title>Party Game</title>
-    
     <script src="script.js"></script>
     <script defer src="game.js"></script>
     <script defer src="popup.js"></script>
 
-    <link rel="shortcut icon" href="assets/favicon.webp" type="image/x-icon">
-    <link rel="prefetch" href="screens/first.html" />
-    <link rel="prefetch" href="screens/options.html" />
-
-    <!-- 3rd party -->
     <script src="assets/scripts/easing.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/spin-wheel@4.3.1/dist/spin-wheel-iife.js"></script>
+    <link rel="shortcut icon" href="assets/favicon.webp" type="image/x-icon">
+
+    <link rel="prefetch" href="screens/first.html" />
+    <link rel="prefetch" href="screens/options.html" />
 </head>
 
 <body>
@@ -45,14 +42,10 @@
     </div>
 
     <div id="popup">
-        <div id="game-connect-loader" style="display: flex; flex-direction: column; align-items: center;">
-            <div class="lds-facebook" style="margin-top: -15px;">
-                <div></div>
-                <div></div>
-                <div></div>
-            </div>
-
-            Waiting for everyone to connect...
+        <div class="lds-facebook">
+            <div></div>
+            <div></div>
+            <div></div>
         </div>
         <h1 id="popup-text"></h1>
     </div>
@@ -61,10 +54,10 @@
     window.onload = function () {
         setTimeout(() => {
             document.getElementById("loading-cover").classList.add("done")
-            setTimeout(() => {
-                document.getElementById("loading-cover").style.display = "none"
-            }, 600)
-        }, 100);
+
+            document.getElementById("loading-cover").style.display = "none";
+            pushScreen("game_wheel")
+        }, 500);
     }
 </script>
 <style>

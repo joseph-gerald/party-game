@@ -32,3 +32,26 @@
     gap: 10px;
     margin-top: 10px;
 }
+
+#popup {
+    width: 100vw;
+    padding: 25px 0;
+    display: flex;
+
+    justify-content: center;
+    align-items: center;
+
+    position: absolute;
+    top: 50%;
+    left: 0;
+
+    transform: translateY(-50%);
+
+    background-color: #191919;
+    backdrop-filter: blur(20px);
+
+    color: var(--background);
+    transition: 0.3s ease-out;
+
+    z-index: -1;
+}

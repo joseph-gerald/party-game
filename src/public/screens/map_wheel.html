@@ -27,6 +27,8 @@
     }
 
     function addItems(map_array) {
+        let last_map = null;
+
         maps = map_array;
 
         wheel.innerHTML = "";
@@ -34,10 +36,11 @@
         for (let i = 0; i < 100 * 1.5; i++) {
             for (const [index, map] of Object.entries(maps)) {
                 addWheelItem(map);
+                last_map = map;
             }
         }
 
-        addWheelItem(maps[0].image_url, maps[0].steps);
+        addWheelItem(last_map);
     }
 
     function spinWheel(index) {
@@ -95,7 +98,13 @@
     addItems([
         {
             image_url: "assets/maps/sunflower.webp",
-            steps: 12
+            step_map: "data/maps/sunflower.json",
+            name: "Sunflower",
+            steps: 12,
+            dice: {
+                min: 1,
+                max: 3
+            }
         }
     ])
 

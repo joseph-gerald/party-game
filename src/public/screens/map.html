@@ -7,38 +7,10 @@
     align-items: center;
 ">
     <div class="map">
-        <img id="map-img" src="" alt="">
+        <img draggable="false" id="map-img" src="" alt="">
 
         <div class="players">
         </div>
-    </div>
-
-    <div class="loading-bar-parent" style="
-        width: 100vw;
-        padding: 25px 0;
-        display: flex;
-
-        justify-content: center;
-        align-items: center;
-
-        position: absolute;
-        top: 50%;
-        left: 0;
-
-        transform: translateY(-50%);
-
-        background-color: #191919;
-        backdrop-filter: blur(20px);
-
-        color: var(--background);
-        transition: 0.3s ease-out;
-    ">
-        <div class="lds-facebook">
-            <div></div>
-            <div></div>
-            <div></div>
-        </div>
-        <h1 id="loading-bar-text"></h1>
     </div>
 </div>
 
@@ -48,48 +20,25 @@
     const map = window.room.map;
     let steps = [];
 
-    const loadingBarParent = document.querySelector(".loading-bar-parent");
-    const loadingBarText = document.getElementById("loading-bar-text");
+    const popup = document.getElementById("popup");
+    const popupMessage = document.getElementById("popup-text");
 
     const playersElm = document.querySelector(".players");
 
     mapImg.src = map.image_url;
-
-    function showText(text) {
-        loadingBarParent.style.height = "auto";
-        loadingBarText.innerText = text;
-        loadingBarText.style.transform = "none";
-
-        loadingBarText.style.scale = "1";
-        loadingBarParent.style.padding = "25px 0";
-    }
-
-    function hideText() {
-        loadingBarText.style.transition = ".5s";
-        loadingBarText.style.transform = "translateX(calc(-50vw - 100%))"
-        loadingBarParent.style.height = loadingBarParent.offsetHeight - 50 + "px";
-
-        setTimeout(() => {
-            loadingBarParent.style.padding = "0";
-            loadingBarParent.style.height = "0";
-
-            setTimeout(() => {
-                loadingBarText.innerText = "";
-            }, 500);
-        }, 300)
-    }
-
     window.hideText = hideText;
     window.showText = showText;
 
+    showPopup();
+
     function onLoad() {
-        const loadingBar = document.querySelector(".lds-facebook");
+        const loadingBar = document.getElementById("game-connect-loader");
 
         loadingBar.style.transition = ".35s ease-out";
         loadingBar.style.transform = "translateX(calc(-50vw - 100%))"
 
         setTimeout(() => {
-            loadingBarParent.style.padding = "0";
+            popup.style.padding = "0";
 
             loadingBar.style.height = "0";
             loadingBar.style.overflow = "hidden";
@@ -130,7 +79,18 @@
         });
     }
 
-    window.syncPositions = syncPositions;
+    function movePlayer(player, step) {
+        const diff = step - player.step;
+
+        for (let i = 0; i < Math.abs(diff); i++) {
+            setTimeout(() => {
+                player.step += Math.sign(diff); // MDN docs clutch
+                syncPositions();
+            }, i * 400)
+        }
+    }
+
+    window.movePlayer = movePlayer;
 
     function loadPlayers() {
         const players = Object.values(window.room.players);
@@ -177,12 +137,45 @@
 
         loadPlayers();
 
+        connection.send("game.ready")
+    }
+
+    async function introduce() {
+        return connection.send("game.wheel.ready");
+        
+        showText(`Welcome to the ${room.map.name}`);
+        await sleep(2000);
+        setText("We will spin the wheel to determine the game.");
+        await sleep(2000);
+        setText("1st place will move 3 steps, 2nd move 2, and 3rd move 1.");
+        await sleep(4000);
+        hideText();
+
+        notify("Game Wheel", "Please wait, while we prepare the wheel.", 3000);
+
+        connection.send("game.wheel.ready");
+    }
+
+    async function onGameReady() {
         setTimeout(() => {
             onLoad();
+
+            setTimeout(() => {
+                introduce();
+            }, 1500)
         }, 500)
     }
 
     load();
+
+    async function onGameWheelReady(games) {
+        room.game_index = games[0];
+        room.games = games[1];
+        pushScreen("game_wheel");
+    }
+
+    connection.events.on("game.wheel.ready", onGameWheelReady);
+    connection.events.on("game.ready", onGameReady);
 </script>
 
 <style>
@@ -192,7 +185,7 @@
         width: fit-content;
         height: fit-content;
 
-        transition: 1s;
+        transition: 0.75s;
         filter: blur(20px);
     }
 
