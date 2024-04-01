@@ -10,6 +10,16 @@ maps = [
             min: 1,
             max: 3
         }
+    },
+    {
+        image_url: "assets/maps/skibidi_land.png",
+        step_map: "data/maps/skibidi_land.json",
+        name: "Skibidi Land",
+        steps: 27,
+        dice: {
+            min: 1,
+            max: 6
+        }
     }
 ]
 
