@@ -20,6 +20,36 @@ maps = [
             min: 1,
             max: 6
         }
+    },
+    {
+        image_url: "assets/maps/hotland.png",
+        step_map: "data/maps/hotland.json",
+        name: "Hotland",
+        steps: 12,
+        dice: {
+            min: 1,
+            max: 3
+        }
+    },
+    {
+        image_url: "assets/maps/cow_palace.png",
+        step_map: "data/maps/cow_palace.json",
+        name: "Cow Palace",
+        steps: 21,
+        dice: {
+            min: 1,
+            max: 6
+        }
+    },
+    {
+        image_url: "assets/maps/cat_island.png",
+        step_map: "data/maps/cat_island.json",
+        name: "Cat Island",
+        steps: 11,
+        dice: {
+            min: 1,
+            max: 3
+        }
     }
 ]
 
