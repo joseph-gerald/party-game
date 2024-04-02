@@ -51,7 +51,6 @@
 ```console
 $ git clone https://github.com/joseph-gerald/party-game
 $ npm i
-$ npm i --g nodemon
 $ npm run dev
 ```
 
