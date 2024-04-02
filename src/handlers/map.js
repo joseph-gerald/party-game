@@ -1,4 +1,4 @@
-const handled_types = ["room.start"]
+const handled_types = ["room.start", "map.spin.ready", "map.spin.prepare"]
 
 maps = [
     {
@@ -36,25 +36,36 @@ module.exports = class {
         switch (type) {
             case "room.start":
                 if (!session.host) return session.send("server.error.401", "You are not the host");
+                break;
+
+            case "map.spin.prepare":
+                session.send("map.spin.prepare", JSON.stringify(maps));
+                break;
+
+            case "map.spin.ready":
+                const room = session.room;
+
+                session.state = "map.spin";
+
+                for (const client of room.clients) {
+                    if (client.state != "map.spin") return;
+                }
+
+                const noGo = 100 * 1.5 * maps.length * 0.5;
+                const range = 60;
+
+                let index = noGo;
+
+                while (Math.abs(index - noGo) < range) {
+                    index = Math.floor(Math.random() * 100 * maps.length);
+                }
+
+                const map = maps[index % maps.length];
+
                 setTimeout(() => {
-                    session.room.broadcast("map.spin.prepare", JSON.stringify(maps));
-
-                    setTimeout(() => {
-                        const noGo = 100 * 1.5 * maps.length * 0.5;
-                        const range = 60;
-
-                        let index = noGo;
-
-                        while (Math.abs(index - noGo) < range) {
-                            index = Math.floor(Math.random() * 100 * maps.length);
-                        }
-
-                        const map = maps[index % maps.length];
-
-                        session.room.broadcast("map.spin", index);
-                        console.log(map)
-                    }, 1000);
-                }, 250);
+                    session.room.broadcast("map.spin", index);
+                    console.log(map)
+                }, 1000);
         }
     }
 };

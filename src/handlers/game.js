@@ -1,25 +1,41 @@
 const handled_types = ["game.ready", "game.wheel.ready"]
-
-games = [
-    {
-        image: "assets/games/hot_potato.webp",
-        name: "Hot Potato",
-        type: "individual",
-    },
-    {
-        image: "assets/games/comet_dodge.webp",
-        name: "Comet Dodge",
-        type: "individual",
-    }
-]
+const [
+    CometDodge,
+    HotPotato
+] = [
+        require('./games/cometDodge.js'),
+        require('./games/hotPotato.js'),
+    ];
 
 module.exports = class {
     constructor(server) {
         this.server = server;
+
+        this.games = [
+                {
+                    image: "assets/games/hot_potato.webp",
+                    name: "Hot Potato",
+                    type: "individual",
+                    screen: "hot_potato",
+                    handler: new HotPotato(server)
+                },
+                {
+                    image: "assets/games/comet_dodge.webp",
+                    name: "Comet Dodge",
+                    type: "individual",
+                    screen: "comet_dodge",
+                    handler: new CometDodge(server)
+                }
+            ];
+
+        this.gamesWithoutHandler = this.games.map(game => {
+            const { handler, ...rest } = game;
+            return rest;
+        });
     }
 
     handles(type) {
-        return handled_types.includes(type);
+        return handled_types.includes(type) || this.games.find(game => game.handler.handles(type));
     }
 
     handle(session, type, data) {
@@ -47,16 +63,23 @@ module.exports = class {
                     if (client.gameReady != 2) return;
                 }
 
-                const index = Math.floor(Math.random() * games.length);
-                const game = games[index];
+                const index = Math.floor(Math.random() * this.games.length);
+                const game = this.games[index];
 
                 session.room.game = game;
-
+                
                 room.broadcast("game.wheel.ready", JSON.stringify([
                     index,
-                    games
+                    this.gamesWithoutHandler
                 ]));
                 break;
+            default:
+                {
+                    const game = session.room.game;
+                    if (!game) return;
+    
+                    game.handler.handle(session, type, data);
+                }
         }
     }
 };

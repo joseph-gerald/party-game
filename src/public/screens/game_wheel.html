@@ -28,12 +28,19 @@
     const wheel = new spinWheel.Wheel(container, props);
 
     const winningItemIndex = window.room.game_index;
+    const game = window.room.games[winningItemIndex];
     const duration = 6000;
+
+    window.room.game = game;
 
     wheel.spinToItem(winningItemIndex, duration, true, 15, 1, easing.cubicOut)
 
     setTimeout(async () => {
         showText(`${window.room.games[winningItemIndex].name}`);
+        await sleep(750);
+        pushScreen("game/" + game.screen);
+        await sleep(750);
+        hideText();
     }, duration - 500)
 </script>
 

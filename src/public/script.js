@@ -116,6 +116,7 @@ class Connection {
     }
 
     send(type, data = "") {
+        console.log("OUTGOING", type, data);
         this.socket.send([type, typeof data == "object" ? JSON.stringify(data) : data].map(part => encode(part).replaceAll("=", "")).join("/"));
     }
 

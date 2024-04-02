@@ -40,6 +40,7 @@ class Session {
         this.room = null;
 
         this.gameReady = 0;
+        this.state = "";
 
         this.profile = {
             id: this.id,

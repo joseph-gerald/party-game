@@ -108,8 +108,13 @@
         }
     ])
 
-    connection.events.on("map.spin.prepare", addItems);
+    connection.events.on("map.spin.prepare", data => {
+        addItems(data);
+        connection.send("map.spin.ready");
+    });
     connection.events.on("map.spin", onSpin);
+
+    connection.send("map.spin.prepare");
 </script>
 
 
