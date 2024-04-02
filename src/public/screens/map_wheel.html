@@ -53,6 +53,7 @@
 
         const random = index;
         const figure = figures[random];
+        const map = maps[random % maps.length];
 
         const isMobile = window.outerWidth < 800;
         const figureWidth = figure.offsetWidth;
@@ -73,13 +74,11 @@
             figure.style.boxShadow = "0 18px 36px -6px black";
             figure.style.transform = "scale(2) rotate(360deg)"
 
-            window.notify("Map", `Selected ${figure.querySelector("figcaption").innerText.split(" /")[0]}, preparing map...`, 5000, ["success"]);
+            window.notify("Map", `Selected ${map.name}, preparing map...`);
 
             setTimeout(() => {
                 figure.style.transition = "transform 0.75s";
                 figure.style.transform = "scale(1.5) rotate(360deg)"
-
-                const map = maps[random % maps.length];
                 window.room.map = map;
 
                 setTimeout(() => {

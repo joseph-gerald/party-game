@@ -102,5 +102,16 @@ function hidePopup() {
     }, 300)
 }
 
+function gameReady(state, callback) {
+    connection.send("game.ready", state);
+
+    function cb() {
+        callback();
+        connection.events.remove("game.ready." + state, cb);
+    }
+
+    connection.events.on("game.ready." + state, cb);
+}
+
 init();
 window.Sounds = Sounds;

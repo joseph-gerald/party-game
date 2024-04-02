@@ -128,6 +128,8 @@
 
         const dimensions = json["dimensions"];
 
+        notify("Map", `Loaded <b>${map.name}</b> by <b>${json.author}</b>`, 4000, ["success"])
+
         room.map.steps = steps = json["steps"].map(step => {
             return {
                 x: step.x / dimensions.width * 100,
@@ -137,12 +139,12 @@
 
         loadPlayers();
 
-        connection.send("game.ready")
+        connection.send("game.ready", "game_wheel")
     }
 
     async function introduce() {
         return connection.send("game.wheel.ready");
-        
+
         showText(`Welcome to the ${room.map.name}`);
         await sleep(2000);
         setText("We will spin the wheel to determine the game.");
@@ -156,7 +158,7 @@
         connection.send("game.wheel.ready");
     }
 
-    async function onGameReady() {
+    function onGameReady(data) {
         setTimeout(() => {
             onLoad();
 
@@ -175,7 +177,7 @@
     }
 
     connection.events.on("game.wheel.ready", onGameWheelReady);
-    connection.events.on("game.ready", onGameReady);
+    connection.events.on("game.ready.game_wheel", onGameReady);
 </script>
 
 <style>

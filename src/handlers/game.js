@@ -44,15 +44,13 @@ module.exports = class {
 
         switch (type) {
             case "game.ready":
-                if (session.gameReady == 1) return;
-
-                session.gameReady = 1;
-
+                session.gameReady = data;
+                
                 for (const client of room.clients) {
-                    if (!client.gameReady) return;
+                    if (client.gameReady != data) return;
                 }
 
-                room.broadcast("game.ready");
+                room.broadcast("game.ready."+data);
                 break;
             case "game.wheel.ready":
                 if (session.gameReady == 2) return;
@@ -63,7 +61,7 @@ module.exports = class {
                     if (client.gameReady != 2) return;
                 }
 
-                const index = Math.floor(Math.random() * this.games.length);
+                const index = 1 || Math.floor(Math.random() * this.games.length);
                 const game = this.games[index];
 
                 session.room.game = game;

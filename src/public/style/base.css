@@ -97,7 +97,7 @@ h1 {
 }
 
 notification {
-    min-width: 200px;
+    min-width: 275px;
 
     display: flex;
     flex-direction: column;

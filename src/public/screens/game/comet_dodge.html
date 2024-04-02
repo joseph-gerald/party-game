@@ -1,0 +1,189 @@
+<div id="comet-dodge-grid">
+
+</div>
+
+<script>
+    const grid = document.getElementById("comet-dodge-grid");
+
+    function generateGrid() {
+        grid.innerHTML = "";
+
+        grid.style.display = "grid";
+        grid.style.gridTemplateColumns = "repeat(10, 1fr)";
+        grid.style.gridTemplateRows = "repeat(10, 1fr)";
+
+        for (let i = 0; i < 100; i++) {
+            const cell = document.createElement("div");
+            grid.appendChild(cell);
+        }
+
+        return grid;
+    }
+
+    function addPlayers() {
+        for (const player of Object.values(window.room.players)) {
+            const playerElm = document.createElement("player");
+            const elmContainer = document.createElement("div");
+
+            const rocketImg = document.createElement("img");
+            const avatarImg = document.createElement("img");
+
+            rocketImg.src = "assets/games/comet_dodge/rocket_driving.webp";
+            avatarImg.src = `assets/avatars/${player.avatar_id}.png`;
+
+            avatarImg.classList.add("avatar");
+
+            playerElm.id = player.id;
+
+            elmContainer.append(rocketImg, avatarImg);
+
+            playerElm.appendChild(elmContainer);
+            grid.appendChild(playerElm);
+        }
+    }
+
+    function drawPlayers() {
+
+    }
+
+    function summonComet() {
+        const imgElm = document.createElement("img");
+        imgElm.src = "assets/games/comet_dodge/comet.webp";
+
+        imgElm.style.position = "absolute";
+        imgElm.style.width = "10%";
+        imgElm.style.height = "10%";
+
+        grid.appendChild(imgElm);
+
+        return imgElm;
+    }
+
+    function comet(index, timeout, direction, isRow) {
+        const cells = grid.children;
+        const matchedCells = [...cells].filter((_, i) => {
+            if (isRow) {
+                return i >= index * 10 && i < index * 10 + 10;
+            } else {
+                return i % 10 === index;
+            }
+        });
+        const right = direction == "right";
+
+        const cometSpeed = 500;
+
+        matchedCells.forEach(cell => {
+            cell.style.backgroundColor = "rgba(255,100,100,0.5)";
+
+            setTimeout(() => {
+                cell.style.backgroundColor = "transparent";
+            }, timeout);
+        });
+
+        setTimeout(() => {
+            const comet = summonComet();
+
+            comet.style.scale = "1.1";
+
+            comet.style.transition = `top ${cometSpeed}ms, left ${cometSpeed}ms`;
+
+            if (isRow) {
+                comet.style.rotate = right ? "-35deg" : "145deg";
+                comet.style.top = `${index * 10}%`;
+                comet.style.left = right ? "-10%" : "100%";
+                comet.style.translate = right ? "0 -5%" : "0 5%";
+            } else {
+                comet.style.rotate = right ? "55deg" : "235deg";
+                comet.style.top = right ? "-10%" : "100%";
+                comet.style.left = `${index * 10}%`;
+                comet.style.translate = right ? "5% 0" : "-5% 0";
+            }
+
+            setTimeout(() => {
+                if (isRow) {
+                    comet.style.left = right ? "100%" : "-10%";
+                } else {
+                    comet.style.top = right ? "100%" : "-10%";
+                }
+
+                setTimeout(() => {
+                    comet.remove();
+                }, cometSpeed);
+            }, 10);
+        }, timeout);
+    }
+
+    window.cometRow = comet;
+
+    generateGrid();
+    addPlayers();
+
+    gameReady("comet_dodge", _ => {
+        hideText();
+    });
+</script>
+
+<style>
+    #comet-dodge-grid {
+        display: grid;
+        width: auto;
+        max-width: calc(100% - 40px);
+        height: 100%;
+        position: relative;
+        overflow: hidden;
+
+        aspect-ratio: 1;
+
+        margin: 20px;
+
+        background-image: url("assets/games/comet_dodge/star.svg");
+        background-size: 10%;
+        background-color: rgb(20,20,30);
+    }
+
+    #comet-dodge-grid>div {
+        border: 0.5px solid rgba(0, 0, 0, 0.5);
+        background-color: transparent;
+        transition: background-color .5s;
+    }
+
+    #comet-dodge-grid player {
+        position: absolute;
+
+
+        width: 20%;
+        height: 20%;
+
+        top: 50%;
+        left: 50%;
+
+        transform: translate(-50%, -50%);
+    }
+
+    #comet-dodge-grid player div {
+        position: relative;
+
+        height: 100%;
+        width: 100%;
+    }
+
+    #comet-dodge-grid player.div {
+        position: relative;
+    }
+
+    #comet-dodge-grid player img {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+    }
+
+    #comet-dodge-grid player img.avatar {
+        width: 40%;
+        height: 40%;
+
+        top: 40%;
+        left: 50%;
+
+        transform: translate(-50%, -50%);
+    }
+</style>

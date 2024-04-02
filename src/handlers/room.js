@@ -126,7 +126,7 @@ module.exports = class {
 
                 session.room.state = "playing";
 
-                session.room.broadcast("room.start", "");
+                session.room.broadcast("room.start");
         }
     }
 };

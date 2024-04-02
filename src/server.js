@@ -50,7 +50,7 @@ class Session {
         }
     }
 
-    send(type, data) {
+    send(type, data = "") {
         try {
             this.client.send([type, typeof data == "object" ? JSON.stringify(data) : data].map(part => encode(part).replaceAll("=", "")).join("/"));
         } catch (error) {
