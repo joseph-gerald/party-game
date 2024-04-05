@@ -94,7 +94,6 @@ module.exports = class {
 
                 setTimeout(() => {
                     session.room.broadcast("map.spin", index);
-                    console.log(map)
                 }, 1000);
         }
     }

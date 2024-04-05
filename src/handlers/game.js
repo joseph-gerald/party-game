@@ -38,12 +38,22 @@ module.exports = class {
         return handled_types.includes(type) || this.games.find(game => game.handler.handles(type));
     }
 
+    handleBroadcast(room, type, data) {
+        const game = room.game;
+        if (!game) return;
+
+        game.handler.handleBroadcast(room, type, data);
+    }
+
     handle(session, type, data) {
         const room = session.room;
         if (!room) return session.send("error", "You are not in a room");
 
         switch (type) {
             case "game.ready":
+                // prevent people abusing an event by sending dupes or bad client code
+                if (session.gameReady == data) return;
+
                 session.gameReady = data;
                 
                 for (const client of room.clients) {
@@ -65,6 +75,7 @@ module.exports = class {
                 const game = this.games[index];
 
                 session.room.game = game;
+                session.game = null;
                 
                 room.broadcast("game.wheel.ready", JSON.stringify([
                     index,

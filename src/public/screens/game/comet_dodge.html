@@ -25,17 +25,17 @@
             const playerElm = document.createElement("player");
             const elmContainer = document.createElement("div");
 
-            const rocketImg = document.createElement("img");
+            const ufoImg = document.createElement("img");
             const avatarImg = document.createElement("img");
 
-            rocketImg.src = "assets/games/comet_dodge/rocket_driving.webp";
+            ufoImg.src = "assets/games/comet_dodge/ufo.webp";
             avatarImg.src = `assets/avatars/${player.avatar_id}.png`;
 
             avatarImg.classList.add("avatar");
 
-            playerElm.id = player.id;
+            playerElm.id = "cd_" + player.id;
 
-            elmContainer.append(rocketImg, avatarImg);
+            elmContainer.append(ufoImg, avatarImg);
 
             playerElm.appendChild(elmContainer);
             grid.appendChild(playerElm);
@@ -77,7 +77,7 @@
 
             setTimeout(() => {
                 cell.style.backgroundColor = "transparent";
-            }, timeout);
+            }, timeout - 50);
         });
 
         setTimeout(() => {
@@ -113,7 +113,7 @@
         }, timeout);
     }
 
-    window.cometRow = comet;
+    window.comet = comet;
 
     generateGrid();
     addPlayers();
@@ -121,6 +121,54 @@
     gameReady("comet_dodge", _ => {
         hideText();
     });
+
+    function keyDown(e) {
+        switch (e.key) {
+            case "ArrowUp":
+            case "w":
+                connection.send("comet_dodge.move", "up");
+                break;
+            case "ArrowLeft":
+            case "a":
+                connection.send("comet_dodge.move", "left");
+                break;
+            case "ArrowDown":
+            case "s":
+                connection.send("comet_dodge.move", "down");
+                break;
+            case "ArrowRight":
+            case "d":
+                connection.send("comet_dodge.move", "right");
+                break;
+        }
+    }
+
+    window.addEventListener("keydown", keyDown);
+
+    function onPlayerMove(data) {
+        const player = document.getElementById("cd_" + data.id);
+
+        player.style.left = data.x * 10 + "%";
+        player.style.top  = data.y * 10 + "%";
+    }
+
+    window.onPlayerMove = onPlayerMove;
+
+    function onComet(data) {
+        const { index, prep, direction } = data;
+        comet(index, prep, direction % 2 == 0 ? "right" : "", direction > 1);
+    }
+
+    function onHit(data) {
+        const player = document.getElementById("cd_" + data);
+
+        player.style.scale = 0.5;
+        player.style.filter = "blur(5px)";
+    }
+
+    connection.events.on("comet_dodge.move", onPlayerMove);
+    connection.events.on("comet_dodge.comet", onComet);
+    connection.events.on("comet_dodge.hit", onHit);
 </script>
 
 <style>
@@ -138,7 +186,7 @@
 
         background-image: url("assets/games/comet_dodge/star.svg");
         background-size: 10%;
-        background-color: rgb(20,20,30);
+        background-color: rgb(20, 20, 30);
     }
 
     #comet-dodge-grid>div {
@@ -151,13 +199,13 @@
         position: absolute;
 
 
-        width: 20%;
-        height: 20%;
+        width: 10%;
+        height: 10%;
 
-        top: 50%;
-        left: 50%;
+        top: 0%;
+        left: 0%;
 
-        transform: translate(-50%, -50%);
+        transition-duration: 250ms;
     }
 
     #comet-dodge-grid player div {
@@ -178,8 +226,8 @@
     }
 
     #comet-dodge-grid player img.avatar {
-        width: 40%;
-        height: 40%;
+        width: 50%;
+        height: 50%;
 
         top: 40%;
         left: 50%;

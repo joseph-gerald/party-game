@@ -16,7 +16,7 @@ const data = {
     rooms: []
 }
 
-let handlers = [
+const handlers = data.handlers = [
     new RoomHandler(data),
     new AvatarHandle(data),
     new MapHandler(data),
@@ -41,6 +41,8 @@ class Session {
 
         this.gameReady = 0;
         this.state = "";
+
+        this.game = null;
 
         this.profile = {
             id: this.id,

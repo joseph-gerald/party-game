@@ -18,7 +18,8 @@ class Room {
     }
 
     broadcast(type, data) {
-        this.clients.forEach(client => client.send(type, data))
+        this.clients.forEach(client => client.send(type, data));
+        this.server.handlers.forEach(handler => handler.handleBroadcast ? handler.handleBroadcast(this, type, data) : null);
     }
 
     kick(id, reason) {
