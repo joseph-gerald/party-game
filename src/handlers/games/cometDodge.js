@@ -40,11 +40,13 @@ module.exports = class {
                     stage++;
 
                     for (let i = 0; i < duration / prep; i++) {
+                        const comets = [];
+
                         for (let j = 0; j < comet; j++) {
                             const direction = Math.floor(Math.random() * 4);
                             const index = Math.floor(Math.random() * 10);
 
-                            room.broadcast("comet_dodge.comet", {
+                            comets.push({
                                 index,
                                 prep,
                                 direction
@@ -86,9 +88,12 @@ module.exports = class {
 
                                 await sleep(50);
                             }, prep);
-                            
+
                             if (quit) return;
                         }
+
+                        room.broadcast("comet_dodge.comet", comets);
+
                         await sleep(prep);
                     }
                 }

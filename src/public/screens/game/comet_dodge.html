@@ -43,10 +43,6 @@
         }
     }
 
-    function drawPlayers() {
-
-    }
-
     function summonComet() {
         const imgElm = document.createElement("img");
         imgElm.src = "assets/games/comet_dodge/comet.webp";
@@ -114,8 +110,6 @@
         }, timeout);
     }
 
-    window.comet = comet;
-
     generateGrid();
     addPlayers();
 
@@ -150,14 +144,14 @@
         const player = document.getElementById("cd_" + data.id);
 
         player.style.left = data.x * 10 + "%";
-        player.style.top  = data.y * 10 + "%";
+        player.style.top = data.y * 10 + "%";
     }
 
-    window.onPlayerMove = onPlayerMove;
-
-    function onComet(data) {
-        const { index, prep, direction } = data;
-        comet(index, prep, direction % 2 == 0 ? "right" : "", direction > 1);
+    function onComet(cometArray) {
+        for (const data of cometArray) {
+            const { index, prep, direction } = data;
+            comet(index, prep, direction % 2 == 0 ? "right" : "", direction > 1);
+        }
     }
 
     function onHit(data) {
