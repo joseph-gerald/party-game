@@ -15,6 +15,7 @@ function showText(text, type = "h1") {
 
     popupMessage.innerHTML = text.replaceAll(" ", "&nbsp;");
     popupMessage.style.transform = "translateX(calc(-50vw - 100%))";
+    popupMessage.style.textAlign = "center";
     popupMessage.style.scale = "1";
 
     showPopup();

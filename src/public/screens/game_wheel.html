@@ -38,6 +38,7 @@
     setTimeout(async () => {
         showText(`${window.room.games[winningItemIndex].name}`);
         await sleep(750);
+        player.game = null;
         pushScreen("game/" + game.screen);
     }, duration - 100)
 </script>

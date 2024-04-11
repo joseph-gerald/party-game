@@ -13,6 +13,8 @@ const Sounds = {
     wheel_spin: new Audio("assets/audio/wheel_spin.mp3"),
 }
 
+const scriptsRun = [];
+
 function notify(title, message, duration=2500, classes=[]) {
     const notification = document.createElement("notification");
     notification.innerHTML = `
@@ -56,7 +58,8 @@ function pushHTML(screen) {
     /* get SCRIPT tag from next screen and eval */
     const script = next.querySelector("script");
     
-    if (script) {
+    if (script && (!scriptsRun.includes(script.innerHTML) || script.getAttribute("runonce") == null)) {
+        scriptsRun.push(script.innerHTML);
         eval(script.innerHTML);
     }
 
