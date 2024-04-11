@@ -28,7 +28,7 @@
 - [ ] 🖱️ Clicking (e.g Tug of war) / Timing games (e.g wack a mole)
 - [ ] 💣 Hot Potato
 - [ ] 🤏 Sorting Game
-- [ ] ☄️ Comet Dodge
+- [x] ☄️ Comet Dodge
 - [ ] 🥷🏿 Parkour/Obby
 - [ ] 🧱 Stacking Game
 - [ ] 🎶 Music Geussing
