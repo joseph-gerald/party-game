@@ -6,6 +6,8 @@
     const originalHandlers = connection.events.handlers;
     const grid = document.getElementById("comet-dodge-grid");
 
+    player.game = { x: 0, y: 0 };
+
     function generateGrid() {
         grid.innerHTML = "";
 
@@ -34,7 +36,11 @@
 
             nametag.innerText = player.username;
             nametag.style.color = "white";
-            nametag.style.zIndex = "50";
+            nametag.style.zIndex = "150";
+            nametag.style.position = "absolute";
+            nametag.style.bottom = "0";
+            nametag.style.left = "50%";
+            nametag.style.transform = "translate(-50%, 0)";
 
             const angle = (player.id + player.username).split("").map(char => char.charCodeAt()).reduce((a,b) => a + b) % 360;
 
@@ -131,34 +137,42 @@
             case "ArrowUp":
             case "w":
                 connection.send("comet_dodge.move", "up");
+                player.game.y = Math.max(0, player.game.y - 1);
                 break;
             case "ArrowLeft":
             case "a":
                 connection.send("comet_dodge.move", "left");
+                player.game.x = Math.max(0, player.game.x - 1);
                 break;
             case "ArrowDown":
             case "s":
                 connection.send("comet_dodge.move", "down");
+                player.game.y = Math.min(9, player.game.y + 1);
                 break;
             case "ArrowRight":
             case "d":
                 connection.send("comet_dodge.move", "right");
+                player.game.x = Math.min(9, player.game.x + 1);
                 break;
         }
+
+        onPlayerMove({ id: player.id, x: player.game.x, y: player.game.y }, false);
     }
 
     window.addEventListener("keydown", keyDown);
 
-    function onPlayerMove(data) {
-        const player = document.getElementById("cd_" + data.id);
+    function onPlayerMove(data, server=true) {
+        const playerElm = document.getElementById("cd_" + data.id);
 
-        player.style.left = data.x * 10 + "%";
-        player.style.top = data.y * 10 + "%";
+        if (data.id == player.id && server) return; // Pray that it dosen't desync 
 
-        player.style.scale = 0.85;
+        playerElm.style.left = data.x * 10 + "%";
+        playerElm.style.top = data.y * 10 + "%";
+
+        playerElm.style.scale = 0.85;
 
         setTimeout(() => {
-            player.style.scale = 1;
+            playerElm.style.scale = 1;
         }, 100);
     }
 
