@@ -50,6 +50,16 @@ maps = [
             min: 1,
             max: 3
         }
+    },
+    {
+        image_url: "assets/maps/shark_map.webp",
+        step_map: "data/maps/shark_map.json",
+        name: "Shark Map",
+        steps: 10,
+        dice: {
+            min: 1,
+            max: 3
+        }
     }
 ]
 
@@ -85,12 +95,12 @@ module.exports = class {
                 const range = 60;
 
                 let index = noGo;
+                let map = null;
 
                 while (Math.abs(index - noGo) < range) {
                     index = Math.floor(Math.random() * 100 * maps.length);
+                    map = maps[index % maps.length];
                 }
-
-                const map = maps[index % maps.length];
 
                 setTimeout(() => {
                     session.room.broadcast("map.spin", index);
