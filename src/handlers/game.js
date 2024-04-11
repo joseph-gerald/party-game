@@ -1,4 +1,4 @@
-const handled_types = ["game.ready", "game.wheel.ready"]
+const handled_types = ["game.ready", "game.wheel.ready", "game.leaderboard.ready"]
 const [
     CometDodge,
     HotPotato
@@ -66,6 +66,7 @@ module.exports = class {
                 if (session.gameReady == 2) return;
 
                 session.gameReady = 2;
+                session.game = null;
 
                 for (const client of room.clients) {
                     if (client.gameReady != 2) return;
@@ -75,12 +76,27 @@ module.exports = class {
                 const game = this.games[index];
 
                 session.room.game = game;
-                session.game = null;
                 
                 room.broadcast("game.wheel.ready", JSON.stringify([
                     index,
                     this.gamesWithoutHandler
                 ]));
+                break;
+            case "game.leaderboard.ready":
+                if (session.gameReady == "leaderboard") return;
+
+                session.gameReady = "leaderboard";
+                
+                for (const client of room.clients) {
+                    if (client.gameReady != "leaderboard") return;
+                }
+
+                room.broadcast("game.leaderboard", [...room.clients.map(player => {
+                    return {
+                        id: player.id,
+                        step: player.profile.step,
+                    };
+                })]);
                 break;
             default:
                 {
