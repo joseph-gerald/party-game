@@ -15,7 +15,7 @@
         setTimeout(() => {
             //console.log("Hosted", data)
 
-            connection.events.remove("host", onHost)
+            connection.events.remove(onHost)
             localStorage.setItem("room", data)
             window.player.host = true;
 

@@ -50,9 +50,15 @@ class EventBus {
         this.listeners[event].push(callback);
     }
 
-    remove(event, callback) {
-        if (this.listeners[event]) {
-            this.listeners[event] = this.listeners[event].filter((cb) => cb != callback);
+    remove(callback, event) {
+        if (event) {
+            if (this.listeners[event]) {
+                this.listeners[event] = this.listeners[event].filter((cb) => cb != callback);
+            }
+        } else {
+            for (const [event, callbacks] of Object.entries(this.listeners)) {
+                this.listeners[event] = callbacks.filter((cb) => cb != callback);
+            }
         }
     }
 

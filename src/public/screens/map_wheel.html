@@ -91,7 +91,7 @@
     function onSpin(data) {
         spinWheel(data);
 
-        connection.events.remove("map.spin", onSpin);
+        connection.events.remove(onSpin);
     }
 
     addItems([

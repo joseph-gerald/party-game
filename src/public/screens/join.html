@@ -13,7 +13,7 @@
         window.notify("Joined", "Sucesfully joined " + data, 2000, ["success"]);
         console.log("Joined", data);
 
-        connection.events.remove("join", onJoin);
+        connection.events.remove(onJoin);
 
         pushScreen("room");
     }
