@@ -3,6 +3,7 @@
 </div>
 
 <script>
+    const originalHandlers = connection.events.handlers;
     const grid = document.getElementById("comet-dodge-grid");
 
     function generateGrid() {
@@ -29,14 +30,22 @@
             const ufoImg = document.createElement("img");
             const avatarImg = document.createElement("img");
 
+            const nametag = document.createElement("b");
+
+            nametag.innerText = player.username;
+            nametag.style.color = "white";
+            nametag.style.zIndex = "50";
+
+            const angle = (player.id + player.username).split("").map(char => char.charCodeAt()).reduce((a,b) => a + b) % 360;
+
             ufoImg.src = "assets/games/comet_dodge/ufo.webp";
             avatarImg.src = `assets/avatars/${player.avatar_id}.png`;
 
             avatarImg.classList.add("avatar");
-
+            ufoImg.style.filter = `hue-rotate(${angle}deg)`
             playerElm.id = "cd_" + player.id;
 
-            elmContainer.append(ufoImg, avatarImg);
+            elmContainer.append(ufoImg, avatarImg, nametag);
 
             playerElm.appendChild(elmContainer);
             grid.appendChild(playerElm);
@@ -74,7 +83,7 @@
 
             setTimeout(() => {
                 cell.style.backgroundColor = "transparent";
-            }, timeout - 150);
+            }, timeout - 350);
         });
 
         setTimeout(() => {
@@ -145,6 +154,12 @@
 
         player.style.left = data.x * 10 + "%";
         player.style.top = data.y * 10 + "%";
+
+        player.style.scale = 0.85;
+
+        setTimeout(() => {
+            player.style.scale = 1;
+        }, 100);
     }
 
     function onComet(cometArray) {
@@ -161,9 +176,34 @@
         player.style.filter = "blur(5px)";
     }
 
+    function onEnd(data) {
+        room.leaderboard = data;
+
+        const winner = data[0];
+        const player = window.room.players[winner.id];
+
+        showText(player.username + " wins!");
+
+        [
+            onPlayerMove,
+            onComet,
+            onHit,
+            onEnd
+        ].forEach(handler => {
+            connection.events.remove(handler);
+        });
+
+        window.removeEventListener("keydown", keyDown);
+
+        setTimeout(() => {
+            pushScreen("map");
+        }, 3000);
+    }
+
     connection.events.on("comet_dodge.move", onPlayerMove);
     connection.events.on("comet_dodge.comet", onComet);
     connection.events.on("comet_dodge.hit", onHit);
+    connection.events.on("comet_dodge.end", onEnd);
 </script>
 
 <style>

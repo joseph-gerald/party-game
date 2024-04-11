@@ -3,13 +3,15 @@ const handled_types = ["comet_dodge.move"]
 const stages = [
     //  [prep, comet, stage duration]
     [2000, 1, 4000],
-    [1000, 6, 5000],
-    [1000, 18, 10000],
-    [1000, 10, 10000],
-    [1000, 12, 10000],
-    [1000, 14, 10000],
+    [2000, 6, 5000],
+    [2700, 18, 10000],
+    [2500, 10, 10000],
+    [2200, 12, 10000],
+    [2000, 14, 10000],
+    [1750, 8, 10000],
+    [1500, 8, 10000],
+    [2500, 18, 10000],
     [750, 8, 10000],
-    [500, 8, 10000],
 ]
 
 const sleep = ms => new Promise(r => setTimeout(r, ms));
@@ -65,15 +67,21 @@ module.exports = class {
 
                                         if (session.game.x == x && session.game.y == y) {
                                             session.game.dead = true;
-                                            session.game.death = { 
+                                            session.game.death = {
                                                 time: Date.now(),
                                                 stage, x, y
                                             };
                                             session.room.broadcast("comet_dodge.hit", session.id);
 
                                             if (room.clients.every(client => client.game.dead)) {
+                                                if (quit) return;
                                                 room.clients.sort((a, b) => a.game.death.time - b.game.death.time);
-                            
+                                                room.clients.reverse()
+
+                                                room.clients.slice(0, 3).map((player, i) => {
+                                                    player.profile.step += 3 - i;
+                                                }).join("<br>")
+
                                                 room.broadcast("comet_dodge.end", room.clients.map(client => ({
                                                     id: client.id,
                                                     death: client.game.death
@@ -86,7 +94,7 @@ module.exports = class {
                                     }
                                 }
 
-                                await sleep(50);
+                                await sleep(1000);
                             }, prep);
 
                             if (quit) return;
@@ -103,31 +111,43 @@ module.exports = class {
 
     handle(session, type, data) {
         session.game ??= {
+            dead: false,
             x: 0,
             y: 0
         };
 
         switch (type) {
             case "comet_dodge.move":
+                console.log(session.game)
                 if (session.game.dead) return;
+
+                let [newX, newY] = [session.game.x, session.game.y]
 
                 switch (data) {
                     case "up":
-                        session.game.y--;
+                        newY--;
                         break;
                     case "down":
-                        session.game.y++;
+                        newY++;
                         break;
                     case "left":
-                        session.game.x--;
+                        newX--;
                         break;
                     case "right":
-                        session.game.x++;
+                        newX++;
                         break;
                 }
 
-                session.game.x = Math.min(9, Math.max(0, session.game.x));
-                session.game.y = Math.min(9, Math.max(0, session.game.y));
+                newX = Math.max(0, Math.min(9, newX));
+                newY = Math.max(0, Math.min(9, newY));
+
+                const tileTaken = session.room.clients.some(client => client.game?.x == newX && client.game?.y == newY);
+
+                console.log(tileTaken)
+                if (tileTaken) return;
+
+                session.game.x = newX;
+                session.game.y = newY;
 
                 session.room.broadcast("comet_dodge.move", {
                     id: session.id,
