@@ -41,20 +41,12 @@ body {
 
     background-color: var(--background);
     backdrop-filter: blur(25px);
-}
 
-#loading-cover h1 {
-    transition-delay: 150ms;
-    transition-duration: 350ms;
+    user-select: none;
 }
 
 #loading-cover.done {
     opacity: 0;
-}
-
-#loading-cover.done h1 {
-    opacity: 0;
-    transform: scaleY(0.5) rotateY(45deg);
 }
 
 input {
