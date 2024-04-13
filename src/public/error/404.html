@@ -1,29 +1,63 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="icon" type="image/x-icon" href="/favicon.png">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Jersey 15:wght@400;500,800&display=swap">
     <title>Not Found</title>
 </head>
-<body id="body">
+
+<body>
     <style>
         body {
-            background-color: rgb(4, 5, 8);
-            color: #aaaaaa;
-            font-family: monospace;
+            background-color: #f4f7f6;
+            color: #151f1a;
+            font-family: "Jersey 15";
+            height: 100vh;
+            margin: 0;
+
             display: flex;
             justify-content: center;
             align-items: center;
+            flex-direction: column;
+
+            overflow: hidden;
+        }
+
+        body > * {
+            z-index: 50;
+        }
+
+        div {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        img {
+            position: absolute;
+            top: -2px;
+            left: 0;
+
+            z-index: 0;
+            object-fit: cover;
+
+            width: 100vw;
             height: 100vh;
-            margin: 0;
         }
     </style>
-    <h1>404|</h1>
-    This resource could not be found
-    <br>
+    <img draggable="false" src="error/clouds.svg" alt="">
+    <h1 style="font-size: 80px; margin: 0px;">404</h1>
+
+    <div id="content">
+
+    </div>
+
     <script>
-        body.append("host: " + location.hostname + " | path: " + location.pathname)
+        content.innerHTML += `<u>${location.host}</u>&nbsp;could not find anything on&nbsp;<b>${location.pathname}</b>`;
     </script>
 </body>
+
 </html>
