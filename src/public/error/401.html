@@ -8,14 +8,13 @@
     <link rel="icon" type="image/x-icon" href="/favicon.png">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Jersey 15:wght@400;500,800&display=swap">
     <link rel="stylesheet" href="/error/style.css">
-    <title>Not Found</title>
+    <title>Unauthorized</title>
 </head>
 
 <body>
     <div class="error-body">
-
         <img draggable="false" src="/error/clouds.svg" alt="">
-        <h1 style="font-size: 80px; margin: 0px;">404</h1>
+        <h1 style="font-size: 80px; margin: 0px;">401</h1>
 
         <div id="content">
 
@@ -27,8 +26,19 @@
             const contents = document.querySelectorAll("#content");
             const lastContent = contents[contents.length - 1];
 
-            lastContent.innerHTML += `<u>${location.host}</u>&nbsp;could not find anything on&nbsp;<b>${location.pathname}</b>`;
+            lastContent.innerHTML += `<u>${location.host}</u>&nbsp;requires authentication to access to&nbsp;<b>${location.pathname}</b>`;
         </script>
     </div>
 </body>
+<style>
+    .error-body,
+    body {
+        color: rgb(31, 21, 31);
+    }
+
+    .error-body img {
+        filter: hue-rotate(120deg) grayscale(0.5);
+    }
+</style>
+
 </html>
