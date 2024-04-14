@@ -60,7 +60,7 @@ class Session {
 
             this.send("error", {
                 title: "Encoder Error",
-                message: "Something went wrong when encoding your message. Please report EN01."
+                message: "Something went wrong when encoding your message. Please report EN01/400."
             })
         }
     }
@@ -124,14 +124,14 @@ function handleConnection(client, request) {
                 console.log(error);
                 session.send("error", {
                     title: "Internal Server Error",
-                    message: "Something went wrong on our end, please report EH01."
+                    message: "Something went wrong on our end, please report EH01/500."
                 })
             }
         } catch (error) {
             console.log(error);
             session.send("error", {
                 title: "Decoder Error",
-                message: "Something went wrong when decoding your message. Please report DE01."
+                message: "Something went wrong when decoding your message. Please report DE01/400."
             })
         }
     }

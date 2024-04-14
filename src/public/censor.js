@@ -1,17 +1,15 @@
 (() => {
+    // if they put enough effort to overwrite IsLocalhost they would find a way to bypass anyways
+    if (isLocalhost) return;
+
     let timeoutId = null;
     const cover = document.getElementById("loading-cover");
 
     function integrityCheck() {
         const documentCover = document.getElementById("loading-cover");
 
-        if (documentCover == null) {
-            console.log("Censor script not loaded properly");
+        if (documentCover == null || documentCover !== cover)
             location.reload();
-        } else if (documentCover !== cover) {
-            console.log("Censorship div has been tampered with!");
-            location.reload();
-        }
     }
 
     setInterval(integrityCheck, 100);
@@ -38,7 +36,6 @@
         }
 
         timeoutId = setTimeout(() => {
-            console.log(delay)
             cover.style.display = visible ? "none" : "flex";
         }, delay * 2);
     }

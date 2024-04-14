@@ -32,7 +32,8 @@
 - [ ] 🥷🏿 Parkour/Obby
 - [ ] 🧱 Stacking Game
 - [ ] 🎶 Music Geussing
-- [ ] 🗳️ Hot Potato
+- [ ] 🗳️ Voting Game
+- [ ] ⚖️ Prisoners Dilemma
 <br>
 
 ![image](https://github.com/joseph-gerald/party-game/assets/73967013/f1b38750-6e93-400b-8608-f4ff09efbfb6)
@@ -62,3 +63,5 @@ $ npm run dev
 [Dadik / Avatars](https://dadik.lol/)
 <br>
 [CrazyTim / spin-wheel](https://github.com/CrazyTim/spin-wheel)
+<br>
+[Billboard 100 Data](https://github.com/mhollingshead/billboard-hot-100)

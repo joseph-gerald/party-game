@@ -14,6 +14,7 @@ const Sounds = {
 }
 
 const scriptsRun = [];
+const callbacks = [];
 
 function notify(title, message, duration=2500, classes=[]) {
     const notification = document.createElement("notification");

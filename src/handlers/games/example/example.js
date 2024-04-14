@@ -1,4 +1,4 @@
-const handled_types = []
+const handled_types = ["example.event"]
 
 module.exports = class {
     constructor(server) {

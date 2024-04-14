@@ -185,7 +185,7 @@
             setTimeout(() => {
                 introduce();
             }, 1500)
-        }, 500)
+        }, isLocalhost ? 0 : 500)
     }
 
     load();

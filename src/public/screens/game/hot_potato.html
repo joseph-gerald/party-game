@@ -1,7 +1,172 @@
 <div>
-
+    <div id="circle-container">
+        <div id="center">
+            <button>Click Me or <kbd>Space</kbd> to pass</button>
+        </div>
+        <div id="orbit-container"></div>
+        <img id="hot-potato" src="assets/games/hot_potato.webp" alt="">
+    </div>
 </div>
 
 <script>
-    
+    const hotPotato = document.getElementById("hot-potato");
+
+    function addOrbitElements(elements) {
+        const orbitContainer = document.getElementById("orbit-container");
+
+        for (let i = 0; i < elements.length; i++) {
+            const orbitElement = elements[i];
+
+            orbitElement.classList.add("orbit-element");
+
+            orbitContainer.append(orbitElement);
+        }
+    }
+
+    function orbitElement(elements) {
+        const orbitContainer = document.getElementById("orbit-container");
+        const center = document.getElementById("center");
+        const radius = Math.min(400, Math.min(window.innerWidth, window.innerHeight) / 2 - 50);
+
+        orbitContainer.style.width = `${radius * 2}px`;
+        orbitContainer.style.height = `${radius * 2}px`;
+
+        for (let i = 0; i < elements.length; i++) {
+            const angle = (2 * Math.PI / elements.length) * i;
+            const x = center.offsetWidth / 2 + radius * Math.cos(angle) - (200 - radius) / 2;
+            const y = center.offsetHeight / 2 + radius * Math.sin(angle) - (200 - radius) / 2;
+
+            const orbitElement = elements[i];
+
+            orbitElement.classList.add("orbit-element");
+            orbitElement.style.left = `${x + radius / 2}px`;
+            orbitElement.style.top = `${y + radius / 2}px`;
+        }
+    }
+
+    function createPlayer(player) {
+        const playerElm = document.createElement("div");
+        const avatar = document.createElement("img");
+        const username = document.createElement("b")
+
+        playerElm.id = "hp_" + player.id;
+        avatar.src = `assets/avatars/${player.avatar_id}.png`;
+        avatar.classList.add("avatar");
+
+        username.innerText = player.username;
+
+        playerElm.classList.add("player");
+        playerElm.append(avatar, username);
+
+        setTimeout(_ => {
+            playerElm.style.scale = 1;
+        }, 50)
+
+        return playerElm;
+    }
+
+    function giveHotPotato(player) {
+        hotPotato.style.left = player.style.left;
+        hotPotato.style.top = player.style.top;
+    }
+
+    function hideHotpotato() {
+        hotPotato.style.left = "50%";
+        hotPotato.style.top = "50%";
+    }
+
+    players = Object.values(room.players).map(player => createPlayer(player));
+
+    addOrbitElements(players);
+    orbitElement(players);
+
+    gameReady("hot_potato", _ => {
+        hideText();
+    });
+
+    connection.events.on("hot_potato.pass", onPass);
+    connection.events.on("hot_potato.hide", hideHotpotato);
+    connection.events.on("hot_potato.boom", onBoom);
+    connection.events.on("comet_dodge.end", onEnd);
 </script>
+
+<style>
+    #circle-container {
+        position: relative;
+    }
+
+    #hot-potato,
+    #center {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 100px;
+        height: 100px;
+        text-align: center;
+
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    #center {
+        z-index: 3;
+    }
+
+    #hot-potato {
+        object-fit: contain;
+        width: 25px;
+
+        transition-duration: 550ms;
+    }
+
+    .player {
+        transition-duration: 550ms;
+        position: absolute;
+
+        scale: 0.2;
+        left: 50%;
+        top: 50%;
+
+        width: 50px;
+        text-align: center;
+    }
+
+    .orbit-element {
+        transform: translate(50%, calc(50% - 20px));
+
+        display: flex;
+        flex-direction: column;
+
+        align-items: center;
+    }
+
+    .orbit-element .avatar {
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+    }
+
+    .orbit-element b {
+        white-space: nowrap;
+    }
+
+    #center button {
+        height: 100%;
+        width: 100%;
+
+        background-color: linear-gradient(145deg, #f0f0f0, #cacaca);
+        border: none;
+
+        box-shadow: 20px 20px 60px #bebebe,
+            -20px -20px 60px #ffffff;
+
+        border-radius: 50%;
+    }
+
+    #center button:hover {
+        box-shadow: 20px 20px 60px #bebebe,
+            -20px -20px 60px #ffffff;
+    }
+</style>

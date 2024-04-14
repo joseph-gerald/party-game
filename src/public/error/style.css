@@ -1,0 +1,50 @@
+.error-body,
+body {
+    background-color: #f4f7f6;
+    color: #151f1a;
+    font-family: "Jersey 15";
+    height: 100vh;
+    margin: 0;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+
+    overflow: hidden;
+}
+
+.error-body>* {
+    z-index: 50;
+}
+
+div {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+img {
+    position: absolute;
+    top: -2px;
+    left: 0;
+
+    object-fit: cover;
+
+    width: 100vw;
+    height: 100vh;
+}
+
+#takemehome {
+    text-decoration: none;
+    color: rgba(0, 0, 0, 0.8);
+
+    position: absolute;
+
+    bottom: 10px;
+}
+
+#takemehome:hover {
+    color: rgba(0, 0, 0, 1);
+    text-decoration: underline;
+}

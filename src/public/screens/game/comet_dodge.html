@@ -42,7 +42,7 @@
             nametag.style.left = "50%";
             nametag.style.transform = "translate(-50%, 0)";
 
-            const angle = (player.id + player.username).split("").map(char => char.charCodeAt()).reduce((a,b) => a + b) % 360;
+            const angle = (player.id + player.username).split("").map(char => char.charCodeAt()).reduce((a, b) => a + b) % 360;
 
             ufoImg.src = "assets/games/comet_dodge/ufo.webp";
             avatarImg.src = `assets/avatars/${player.avatar_id}.png`;
@@ -125,13 +125,6 @@
         }, timeout);
     }
 
-    generateGrid();
-    addPlayers();
-
-    gameReady("comet_dodge", _ => {
-        hideText();
-    });
-
     function keyDown(e) {
         switch (e.key) {
             case "ArrowUp":
@@ -161,7 +154,7 @@
 
     window.addEventListener("keydown", keyDown);
 
-    function onPlayerMove(data, server=true) {
+    function onPlayerMove(data, server = true) {
         const playerElm = document.getElementById("cd_" + data.id);
 
         if (data.id == player.id && server) return; // Pray that it dosen't desync 
@@ -213,6 +206,13 @@
             pushScreen("map");
         }, 3000);
     }
+
+    generateGrid();
+    addPlayers();
+
+    gameReady("comet_dodge", _ => {
+        hideText();
+    });
 
     connection.events.on("comet_dodge.move", onPlayerMove);
     connection.events.on("comet_dodge.comet", onComet);

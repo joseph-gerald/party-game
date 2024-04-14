@@ -86,7 +86,7 @@ class Connection {
         socket.onopen = () => {
             setInterval(() => {
                 this.sendPing();
-            }, (isLocalhost ? 30 : 1) * 1000);
+            }, (isLocalhost ? 30 : 0.3) * 1000);
 
             window.connected = true;
             this.sendPing();

@@ -1,10 +1,12 @@
 const handled_types = ["game.ready", "game.wheel.ready", "game.leaderboard.ready"]
 const [
     CometDodge,
-    HotPotato
+    HotPotato,
+    Trivia
 ] = [
         require('./games/cometDodge.js'),
         require('./games/hotPotato.js'),
+        require('./games/trivia.js'),
     ];
 
 module.exports = class {
@@ -25,6 +27,13 @@ module.exports = class {
                     type: "individual",
                     screen: "comet_dodge",
                     handler: new CometDodge(server)
+                },
+                {
+                    image: "assets/games/trivia.webp",
+                    name: "Trivia",
+                    type: "team",
+                    screen: "trivia",
+                    handler: new Trivia(server)
                 }
             ];
 
@@ -42,12 +51,15 @@ module.exports = class {
         const game = room.game;
         if (!game) return;
 
-        game.handler.handleBroadcast(room, type, data);
+        if (game.handler.handleBroadcast) game.handler.handleBroadcast(room, type, data);
     }
 
     handle(session, type, data) {
         const room = session.room;
-        if (!room) return session.send("error", "You are not in a room");
+        if (!room) return session.send("error", {
+            title: "Dispatcher Error",
+            message: "You are not in a room. If you believe this is a mistake please report NR00/401."
+        });
 
         switch (type) {
             case "game.ready":
@@ -72,7 +84,7 @@ module.exports = class {
                     if (client.gameReady != 2) return;
                 }
 
-                const index = 1 || Math.floor(Math.random() * this.games.length);
+                const index = 0; // || Math.floor(Math.random() * this.games.length);
                 const game = this.games[index];
 
                 session.room.game = game;

@@ -8,17 +8,21 @@
     <link rel="stylesheet" href="style/base.css">
     <link rel="stylesheet" href="style/effects.css">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Kumbh Sans:wght@400;500,800&display=swap">
+
     <title>Party Game</title>
+
     <script src="script.js"></script>
     <script defer src="game.js"></script>
     <script defer src="popup.js"></script>
+    <script defer src="censor.js"></script>
 
-    <script src="assets/scripts/easing.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/spin-wheel@4.3.1/dist/spin-wheel-iife.js"></script>
     <link rel="shortcut icon" href="assets/favicon.webp" type="image/x-icon">
-
     <link rel="prefetch" href="screens/first.html" />
     <link rel="prefetch" href="screens/options.html" />
+
+    <!-- 3rd party -->
+    <script src="assets/scripts/easing.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/spin-wheel@4.3.1/dist/spin-wheel-iife.js"></script>
 </head>
 
 <body>
@@ -56,7 +60,11 @@
             document.getElementById("loading-cover").classList.add("done")
 
             document.getElementById("loading-cover").style.display = "none";
-            pushScreen("game_wheel")
+
+            const player = { "id": "2i9sl0occ74558247", "username": "Joseph", "step": 0, "avatar_id": 14, "host": false, "mapElm": {}, "game": null }
+            room.players[player.id] = player
+
+            pushScreen("game/hot_potato")
         }, 500);
     }
 </script>
