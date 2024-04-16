@@ -18,7 +18,7 @@
         rotationResistance: -100,
         lineWidth: 1,
         items: window.room.games.map(game => {
-            game.imageScale = 0.3
+            game.imageScale = 0.25;
             return game;
         })
     }
@@ -29,7 +29,7 @@
 
     const winningItemIndex = window.room.game_index;
     const game = window.room.games[winningItemIndex];
-    const duration = isLocalhost ? 10 : 6000;
+    const duration = skipAnimations ? 10 : 6000;
 
     window.room.game = game;
 

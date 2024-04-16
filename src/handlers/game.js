@@ -2,11 +2,13 @@ const handled_types = ["game.ready", "game.wheel.ready", "game.leaderboard.ready
 const [
     CometDodge,
     HotPotato,
-    Trivia
+    Trivia,
+    PrisonersDilemma
 ] = [
         require('./games/cometDodge.js'),
         require('./games/hotPotato.js'),
         require('./games/trivia.js'),
+        require('./games/prisonersDilemma.js'),
     ];
 
 module.exports = class {
@@ -34,6 +36,13 @@ module.exports = class {
                     type: "team",
                     screen: "trivia",
                     handler: new Trivia(server)
+                },
+                {
+                    image: "assets/games/prisoners_dilemma.webp",
+                    name: "Prisoner\'s dilemma",
+                    type: "individual",
+                    screen: "prisoners_dilemma",
+                    handler: new PrisonersDilemma(server) 
                 }
             ];
 
