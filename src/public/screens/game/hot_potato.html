@@ -10,6 +10,30 @@
 
 <script>
     const hotPotato = document.getElementById("hot-potato");
+    const center = document.querySelector("#center button");
+
+    room.game = {
+        potatoHolder: null,
+        players: room.players
+    }
+
+    function keyDown(e) {
+        switch (e.key) {
+            case " ":
+                center.click();
+                break;
+        }
+    }
+
+    center.onclick = function () {
+        connection.send("hot_potato.pass");
+
+        center.style.scale = 0.9;
+
+        setTimeout(() => {
+            center.style.scale = 1;
+        }, 100);
+    }
 
     function addOrbitElements(elements) {
         const orbitContainer = document.getElementById("orbit-container");
@@ -58,6 +82,8 @@
         playerElm.classList.add("player");
         playerElm.append(avatar, username);
 
+        room.game.players[player.id].elm = playerElm;
+
         setTimeout(_ => {
             playerElm.style.scale = 1;
         }, 50)
@@ -75,6 +101,52 @@
         hotPotato.style.top = "50%";
     }
 
+    function onPass(id) {
+        const player = room.game.players[id];
+
+        room.game.potatoHolder = player;
+        giveHotPotato(player.elm);
+    }
+
+    function onBoom(id) {
+        const player = room.game.players[id];
+
+        player.elm.innerHTML = `<h1 style="font-size: 40px">💥</h1><b>${player.username}</b>`;
+
+        notify("Explosion", 
+        `${player.username} exploded!`)
+
+        hideHotpotato();
+    }
+
+    function onEnd(data) {
+        room.leaderboard = data;
+
+        const winner = data[0];
+        const player = window.room.players[winner.id];
+
+        showText(player.username + " wins!");
+
+        [
+            onPass,
+            hideHotpotato,
+            onBoom,
+            onEnd
+        ].forEach(handler => {
+            connection.events.remove(handler);
+        });
+
+        window.removeEventListener("keydown", keyDown);
+
+        setTimeout(() => {
+            pushScreen("map");
+        }, 3000);
+    }
+
+    function onRemove(data) {
+        
+    }
+
     players = Object.values(room.players).map(player => createPlayer(player));
 
     addOrbitElements(players);
@@ -84,10 +156,13 @@
         hideText();
     });
 
+    window.addEventListener("keydown", keyDown);
+
     connection.events.on("hot_potato.pass", onPass);
     connection.events.on("hot_potato.hide", hideHotpotato);
+    connection.events.on("hot_potato.remove", onRemove);
     connection.events.on("hot_potato.boom", onBoom);
-    connection.events.on("comet_dodge.end", onEnd);
+    connection.events.on("hot_potato.end", onEnd);
 </script>
 
 <style>
@@ -163,6 +238,7 @@
             -20px -20px 60px #ffffff;
 
         border-radius: 50%;
+        transition-duration: 100ms;
     }
 
     #center button:hover {

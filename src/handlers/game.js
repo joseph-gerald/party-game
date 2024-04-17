@@ -49,8 +49,7 @@ module.exports = class {
 
     handleBroadcast(room, type, data) {
         const game = room.game;
-        if (!game) return;
-
+        if (!game || !game.handler) return;
         if (game.handler.handleBroadcast) game.handler.handleBroadcast(room, type, data);
     }
 
@@ -86,6 +85,7 @@ module.exports = class {
 
                 const index = 0; // || Math.floor(Math.random() * this.games.length);
                 const game = this.games[index];
+                game.data = null;
 
                 session.room.game = game;
                 

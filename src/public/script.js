@@ -34,6 +34,8 @@ class Room {
 
         this.status = "idle";
         this.map = null;
+
+        this.game = null;
     }
 }
 
@@ -153,4 +155,8 @@ connection.events.on("server.disconnect", data => {
 
 connection.events.on("error", data => {
     window.notify(data.title, data.message, 5000, ["warning"]);
+});
+
+connection.events.on("notify", data => {
+    window.notify(data.title, data.message, data.duration, data.tags);
 });
