@@ -2,6 +2,11 @@ const old = document.getElementById("old");
 const current = document.getElementById("current");
 const next = document.getElementById("next");
 
+const [room, connection] = [window.room, window.connection];
+
+delete window.connection;
+delete window.room;
+
 const popup = document.getElementById("popup");
 
 const notifications = document.querySelector(".notification-container");
@@ -16,12 +21,12 @@ const Sounds = {
 const scriptsRun = [];
 const callbacks = [];
 
-function notify(title, message, duration=2500, classes=[]) {
+function notify(title, message, duration = 2500, classes = []) {
     const notification = document.createElement("notification");
     notification.innerHTML = `
-        <h3 id="title">${title}</h3>
-        <p id="message">${message}</p>
-    `;
+    <h3 id="title">${title}</h3>
+    <p id="message">${message}</p>
+`;
 
     notifications.appendChild(notification);
 
@@ -52,19 +57,20 @@ function pushHTML(screen) {
     old.innerHTML = current.innerHTML;
     current.innerHTML = next.innerHTML;
     next.innerHTML = screen;
-    
+
     next.style.transitionDuration = "0s";
     next.classList.add("opaque")
 
     /* get SCRIPT tag from next screen and eval */
     const script = next.querySelector("script");
-    
+
     if (script && (!scriptsRun.includes(script.innerHTML) || script.getAttribute("runonce") == null)) {
         scriptsRun.push(script.innerHTML);
         eval(script.innerHTML);
     }
 
-    playSound(Sounds.whoosh, 1.2 + Math.random() * 0.4, 0.5 + Math.random() * 0.3);
+    // Can't play audio without permission (e.g mouse input) and first screen has no JS and forces user to click
+    if (scriptsRun.length) playSound(Sounds.whoosh, 1.2 + Math.random() * 0.4, 0.5 + Math.random() * 0.3);
 
     setTimeout(() => {
         next.style.transitionDuration = "0.4s";

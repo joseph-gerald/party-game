@@ -1,5 +1,5 @@
 function setText(text, type = "h1") {
-    popup.querySelectorAll("#popup h1").forEach(message => message.remove());
+    popup.querySelectorAll("#popup *").forEach(message => message.remove());
 
     const popupMessage = document.createElement(type);
 

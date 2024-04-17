@@ -11,11 +11,15 @@
 <script>
     const hotPotato = document.getElementById("hot-potato");
     const center = document.querySelector("#center button");
+    let lastPass = Date.now();
 
     room.game = {
         potatoHolder: null,
         players: room.players
     }
+
+    const players = Object.values(room.players).map(player => createPlayer(player));
+    const playersBenched = [];
 
     function keyDown(e) {
         switch (e.key) {
@@ -106,24 +110,37 @@
 
         room.game.potatoHolder = player;
         giveHotPotato(player.elm);
+
+        lastPass = Date.now();
     }
 
     function onBoom(id) {
         const player = room.game.players[id];
 
-        player.elm.innerHTML = `<h1 style="font-size: 40px">💥</h1><b>${player.username}</b>`;
+        playersBenched.push(player.elm);
 
-        notify("Explosion", 
-        `${player.username} exploded!`)
+        setTimeout(() => {
+            player.elm.innerHTML = `<h1 style="font-size: 40px">💥</h1><b>${player.username}</b>`;
 
-        hideHotpotato();
+            notify("Explosion", `${player.username} exploded!`)
+
+            setTimeout(() => {
+                hideHotpotato();
+
+                players.splice(players.indexOf(player.elm), 1);
+
+                orbitElement(players);
+
+                player.elm.style.transform = "translate(50%, calc(50% - 20px)) scale(0)";
+            }, 1000);
+        }, Math.max(0, 350 + lastPass - Date.now()));
     }
 
     function onEnd(data) {
         room.leaderboard = data;
 
         const winner = data[0];
-        const player = window.room.players[winner.id];
+        const player = room.players[winner.id];
 
         showText(player.username + " wins!");
 
@@ -143,12 +160,6 @@
         }, 3000);
     }
 
-    function onRemove(data) {
-        
-    }
-
-    players = Object.values(room.players).map(player => createPlayer(player));
-
     addOrbitElements(players);
     orbitElement(players);
 
@@ -160,7 +171,6 @@
 
     connection.events.on("hot_potato.pass", onPass);
     connection.events.on("hot_potato.hide", hideHotpotato);
-    connection.events.on("hot_potato.remove", onRemove);
     connection.events.on("hot_potato.boom", onBoom);
     connection.events.on("hot_potato.end", onEnd);
 </script>
@@ -193,7 +203,7 @@
         object-fit: contain;
         width: 25px;
 
-        transition-duration: 550ms;
+        transition-duration: 350ms;
     }
 
     .player {
@@ -209,7 +219,7 @@
     }
 
     .orbit-element {
-        transform: translate(50%, calc(50% - 20px));
+        transform: translate(50%, calc(50% - 20px)) scale(1);
 
         display: flex;
         flex-direction: column;

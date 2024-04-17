@@ -23,7 +23,6 @@
         </span>
 
         <div id="idle-lobby-container">
-            <b>Empty 🦗</b>
         </div>
     </div>
 </div>
@@ -42,7 +41,7 @@
     }
 
     function onPublicRooms(data) {
-        if (!data.length) return;
+        if (!data.length) return lobbyContainer.innerHTML = "<b>Empty 🦗</b>";
         
         lobbyContainer.innerHTML = "";
 

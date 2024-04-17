@@ -34,7 +34,10 @@ module.exports = class {
                 room.clients.forEach(client => {
                     client.game ??= {
                         x: 0,
-                        y: 0
+                        y: 0,
+                        death: {
+                            time: 2147483647
+                        }
                     };
                 });
 
@@ -73,14 +76,14 @@ module.exports = class {
                                             };
                                             session.room.broadcast("comet_dodge.hit", session.id);
 
-                                            if (room.clients.every(client => client.game.dead)) {
+                                            if (room.clients.filter(client => !client.game.dead).length <= 1) {
                                                 if (quit) return;
                                                 room.clients.sort((a, b) => a.game.death.time - b.game.death.time);
                                                 room.clients.reverse()
 
-                                                room.clients.slice(0, 3).map((player, i) => {
+                                                room.clients.slice(0, 3).forEach((player, i) => {
                                                     player.profile.step += 3 - i;
-                                                }).join("<br>")
+                                                })
 
                                                 room.broadcast("comet_dodge.end", room.clients.map(client => ({
                                                     id: client.id,
@@ -110,15 +113,10 @@ module.exports = class {
     }
 
     handle(session, type, data) {
-        session.game ??= {
-            dead: false,
-            x: 0,
-            y: 0
-        };
+        if (!session.game) return;
 
         switch (type) {
             case "comet_dodge.move":
-                console.log(session.game)
                 if (session.game.dead) return;
 
                 let [newX, newY] = [session.game.x, session.game.y]

@@ -17,7 +17,7 @@
         rotationSpeedMax: 500,
         rotationResistance: -100,
         lineWidth: 1,
-        items: window.room.games.map(game => {
+        items: room.games.map(game => {
             game.imageScale = 0.25;
             return game;
         })
@@ -27,16 +27,16 @@
 
     const wheel = new spinWheel.Wheel(container, props);
 
-    const winningItemIndex = window.room.game_index;
-    const game = window.room.games[winningItemIndex];
+    const winningItemIndex = room.game_index;
+    const game = room.games[winningItemIndex];
     const duration = skipAnimations ? 10 : 6000;
 
-    window.room.game = game;
+    room.game = game;
 
     wheel.spinToItem(winningItemIndex, duration, false, 15, 1, easing.cubicOut)
 
     setTimeout(async () => {
-        showText(`${window.room.games[winningItemIndex].name}`);
+        showText(`${room.games[winningItemIndex].name}`);
         await sleep(750);
         player.game = null;
         pushScreen("game/" + game.screen);

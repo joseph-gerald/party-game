@@ -3,15 +3,52 @@ const handled_types = ["hot_potato.pass"]
 const sleep = ms => new Promise(r => setTimeout(r, ms));
 
 function explode(player) {
+    if (!player) return;
     const room = player.room;
 
-    room.broadcast("hot_potato.boom", room.clients[room.game.data.index].id);
-    room.game.data.players.splice(room.game.data.index, 1);
+    room.broadcast("hot_potato.boom", player.id);
+    room.game.data.players = room.game.data.players.splice(room.game.data.index, 1);
 
+    clearTimeout(room.game.data.playerTimer);
     clearTimeout(room.game.data.explosion);
 
+    player.game.dead = true;
+    player.game.death = {
+        time: Date.now()
+    };
+
+    room.game.data.index = -1;
+
     setTimeout(() => {
-        room.broadcast("hot_potato.remove", room.clients[room.game.data.index].id);
+        room.broadcast("hot_potato.remove", player.id);
+
+        if (room.game.data.players.length == 1) {
+            room.broadcast("notify", {
+                title: "Game Over",
+                message: `${room.game.data.players[0].username} wins!`
+            });
+
+            room.clients.sort((a, b) => a.game.death.time - b.game.death.time);
+            room.clients.reverse()
+
+            room.clients.slice(0, 3).forEach((player, i) => {
+                player.profile.step += 3 - i;
+            });
+
+            room.broadcast("hot_potato.end", room.clients.map(client => ({
+                id: client.id,
+                death: client.game.death
+            })));
+        } else {
+            room.game.data.index = Math.floor(Math.random() * room.game.data.players.length);
+
+            room.broadcast("notify", {
+                title: "Hot Potato",
+                message: `${room.game.data.players[room.game.data.index].username} has the potato!`
+            });
+
+            room.game.data.explosion = queueExplosion(room, 5000 + (10000 * Math.random()));
+        }
     }, 1500);
 }
 
@@ -34,20 +71,31 @@ module.exports = class {
                     client.game ??= {
                         last: Date.now(),
                         freeze: Date.now() - 1000,
-                        receive: Date.now()
+                        receive: Date.now(),
+                        death: {
+                            time: 2147483647
+                        }
                     };
+                });
+
+                const index = Math.floor(Math.random() * room.clients.length);
+                const player = room.clients[index];
+
+                room.broadcast("notify", {
+                    title: "Hot Potato",
+                    message: `${player.username} starts with the potato!`
                 });
 
                 await sleep(1000);
 
                 room.game.data = {
-                    index: Math.floor(Math.random() * room.clients.length),
-                    players: room.clients,
-                    explosion: queueExplosion(room, 10000 + (10000 * Math.random())),
+                    index: index,
+                    players: room.clients.slice(), // copy
+                    explosion: queueExplosion(room, 5000 + (10000 * Math.random())),
                     playerTimer: null
                 }
 
-                room.broadcast("hot_potato.pass", room.clients[room.game.data.index].id);
+                room.broadcast("hot_potato.pass", player.id);
                 break;
         }
     }
@@ -59,17 +107,11 @@ module.exports = class {
     handle(session, type, data) {
         const room = session.room;
 
-        session.game ??= {
-            last: Date.now(),
-            freeze: Date.now() - 1000,
-            receive: Date.now()
-        };
-
-        if (!room.game.data) return;
+        if (!room.game || !room.game.data) return;
 
         switch (type) {
             case "hot_potato.pass":
-                if (session.game.freeze > Date.now()) return;
+                if (session.game.freeze > Date.now() || room.game.data.index == -1) return;
 
                 session.game.last = Date.now();
 
@@ -96,9 +138,6 @@ module.exports = class {
 
                 room.game.data.playerTimer = setTimeout(() => {
                     if (receiver.game.receive < receiver.game.last) return;
-
-                    room.broadcast("hot_potato.boom", receiver.id);
-
                     explode(receiver);
                     room.game.data.index = room.game.data.players.indexOf(session);
                 }, 1000);

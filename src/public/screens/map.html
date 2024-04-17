@@ -17,7 +17,7 @@
 <script>
     const mapImg = document.getElementById("map-img");
     const mapElm = document.querySelector(".map")
-    const map = window.room.map;
+    const map = room.map;
     let steps = [];
 
     const popup = document.getElementById("popup");
@@ -57,7 +57,7 @@
     }
 
     function syncPositions() {
-        const players = Object.values(window.room.players);
+        const players = Object.values(room.players);
 
         steps.forEach(step => {
             step.xOffset = 0;
@@ -99,7 +99,7 @@
     window.movePlayer = movePlayer;
 
     function loadPlayers() {
-        const players = Object.values(window.room.players);
+        const players = Object.values(room.players);
 
         players.forEach(player => {
             const playerElm = document.createElement("player");
@@ -152,16 +152,14 @@
     async function introduce() {
         if (room.leaderboard) {
             showText(`
-            Leader Board
-            <br>
-            ${room.leaderboard.slice(0, 3).map((player, i) => {
+            <h1>Leader Board</h1><hr><h3>${
+                room.leaderboard.slice(0, 3).map((player, i) => {
                 const playerObj = room.players[player.id];
                 return `${i + 1}. ${playerObj.username}`
-            }).join("<br>")
-                }
-            `);
+                }).join("</h3><h3>")
+                }</h3><br>`, "div");
 
-            await sleep(2000);
+            await sleep(3000);
 
             connection.send("game.leaderboard.ready");
             return;
@@ -192,7 +190,7 @@
 
     async function onLeaderboard(data) {
         for (const item of data) {
-            const player = window.room.players[item.id];
+            const player = room.players[item.id];
 
             setText(`${player.username} moves ${item.step - player.step} steps`);
             await sleep(500);
@@ -262,5 +260,9 @@
         z-index: 50;
         transform: translate(-45%, -95%);
         scale: 1.1;
+    }
+
+    #popup h3 {
+        margin: 0;
     }
 </style>

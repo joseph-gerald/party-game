@@ -105,19 +105,19 @@
 
         window.notify("Player Left", `${data.username} left the room`);
         
-        if (window.room.status = "idle") updatePlayerCounter();
+        if (room.status = "idle") updatePlayerCounter();
     });
 
     connection.events.on("room.join", (data) => {
         const player = new Player(data.profile);
-        window.room.host_id = data.host;
+        room.host_id = data.host;
 
         room.players[player.id] = player;
 
         if (player.id == window.player.id) window.player = player;
         else window.notify("Player Joined", `${player.username} joined the room`);
 
-        if (window.room.status = "idle") addPlayer(player);
+        if (room.status = "idle") addPlayer(player);
     });
 
     connection.events.on("room.players", data => {
@@ -128,7 +128,7 @@
                 const player = new Player(player_data);
                 room.players[player_data.id] = player;
 
-                if (window.room.status = "idle") addPlayer(player)
+                if (room.status = "idle") addPlayer(player)
                 if (player_data.id == window.player.id) window.player = player;
 
                 if (player_data.id == room.host_id) {
@@ -141,7 +141,7 @@
     connection.events.on("avatar.update", data => {
         room.players[data.id].avatar_id = data.avatar_id;
 
-        if (window.room.status != "idle") return;
+        if (room.status != "idle") return;
 
         const avatar = document.querySelector(`#_${data.id} img`);
         avatar.style.transform = "rotate(90deg)"; avatar.style.scale = 0;
