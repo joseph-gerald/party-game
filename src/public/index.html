@@ -12,9 +12,9 @@
     <title>Party Game</title>
     
     <script src="script.js"></script>
-    <script defer src="game.js"></script>
-    <script defer src="popup.js"></script>
-    <script defer src="censor.js"></script>
+    <script async src="game.js"></script>
+    <script async src="popup.js"></script>
+    <script async src="censor.js"></script>
 
     <link rel="shortcut icon" href="assets/favicon.webp" type="image/x-icon">
     <link rel="prefetch" href="screens/first.html" />
@@ -64,8 +64,8 @@
             document.getElementById("loading-cover").classList.add("done")
             setTimeout(() => {
                 document.getElementById("loading-cover").style.display = "none"
-            }, 600)
-        }, 100);
+            }, skipAnimations ? 0 : 600)
+        }, skipAnimations ? 0 : 100);
     }
 </script>
 <style>
