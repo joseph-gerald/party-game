@@ -1,12 +1,35 @@
 <div>
-    <h1>Enter Room Code</h1>
+    <h1 style="font-family: monospace;">Enter Room Code</h1>
     <div id="join-form" class="flex row">
-        <input style="text-transform: uppercase;" id="roomcode" type="text" onkeypress="if (event.charCode == 13) join_button.click()">
-        <button id="join_button" class="flex-row" onclick="joinRoom()">JOIN</button>
+        <input style="text-transform: uppercase;" class="gray-border" id="roomcode" type="text"
+            onkeypress="if (event.charCode == 13) join_button.click()">
+        <button id="join_button" class="flex-row gray-border" onclick="joinRoom()">JOIN</button>
+    </div>
+
+    <div>
+        <span>
+            <div class="lds-grid">
+                <div></div>
+                <div></div>
+                <div></div>
+                <div></div>
+                <div></div>
+                <div></div>
+                <div></div>
+                <div></div>
+                <div></div>
+            </div>
+            Public Lobbies
+        </span>
+
+        <div id="idle-lobby-container">
+            <b>Empty 🦗</b>
+        </div>
     </div>
 </div>
 
 <script>
+    const lobbyContainer = document.getElementById("idle-lobby-container");
     roomcode.focus()
 
     function onJoin(data) {
@@ -18,8 +41,32 @@
         pushScreen("room");
     }
 
+    function onPublicRooms(data) {
+        if (!data.length) return;
+        
+        lobbyContainer.innerHTML = "";
+
+        for (const room of data) {
+            const roomElm = document.createElement("div");
+            roomElm.classList.add("public-room", "gray-border");
+
+            roomElm.innerHTML = `
+                <span style="display: flex; align-items: center; gap: 5px"><b>${room.code}</b> / <i style="font-family: monospace"></i> / <i style="font-family: monospace">${room.players}</i></span>
+                <button onclick="document.getElementById('roomcode').value = '${room.code}'; joinRoom()">JOIN</button>
+            `;
+
+            // Anti XSS
+            roomElm.querySelector("i").innerText = room.host.username;
+
+            console.log(room)
+            lobbyContainer.appendChild(roomElm);
+        }
+    }
+
+    connection.send("room.public.listen")
     connection.events.on("join", onJoin);
-    
+    connection.events.on("room.public.info", onPublicRooms);
+
     window.joinRoom = async function () {
         const roomcode = document.getElementById("roomcode").value.toUpperCase();
         localStorage.setItem("room", roomcode);
@@ -27,3 +74,37 @@
         connection.send("room.join", roomcode);
     }
 </script>
+
+<style>
+    #join-form {
+        margin-bottom: 40px;
+    }
+
+    .gray-border {
+        border: 1px solid rgba(0,0,0,0.2);
+        border-radius: 0;
+    }
+
+    button {
+        font-family: monospace;
+    }
+
+    .public-room {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+
+        width: 100%;
+
+        padding: 4px;
+        padding-left: 12px;
+        border-radius: 5px;
+    }
+
+    #idle-lobby-container {
+        display: flex;
+        margin-top: 10px;
+
+        gap: 5px;
+    }
+</style>

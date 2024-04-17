@@ -87,6 +87,10 @@ function handleConnection(client, request) {
         if (!sessionRoom) return;
 
         sessionRoom.remove(session);
+
+        if (!sessionRoom.clients.length) {
+            sessionRoom.close("Room Empty");
+        }
     }
 
     function onMessage(message) {

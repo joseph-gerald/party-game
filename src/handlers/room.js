@@ -1,4 +1,4 @@
-const handled_types = ["room.create", "room.join", "room.players", "room.kick", "room.start"]
+const handled_types = ["room.create", "room.join", "room.players", "room.kick", "room.start", "room.public.listen"]
 
 class Room {
     constructor(host, server) {
@@ -35,6 +35,8 @@ class Room {
     close(reason) {
         this.clients.forEach(client => this.kick(client.id, reason));
         this.server.rooms.splice(this.server.rooms.indexOf(this), 1);
+        
+        broadcastToListeners(this.server);
     }
 
     remove(session) {
@@ -49,6 +51,20 @@ class Room {
     }
 }
 
+function broadcastToListeners(server) {
+    const listeners = server.sessions.filter(session => session.state == "room.public.listen");
+
+    const lobbyInfo = server.rooms.filter(room => room.state == "idle").map(room => ({
+        code: room.code,
+        host: room.host.profile,
+        players: room.clients.length
+    }));
+
+    listeners.forEach(session => {
+        session.send("room.public.info", lobbyInfo);
+    })
+}
+
 module.exports = class {
     constructor(server) {
         this.server = server;
@@ -59,7 +75,6 @@ module.exports = class {
     }
 
     handle(session, type, data) {
-        console.log(data)
         switch (type) {
             case "room.create":
                 {
@@ -74,6 +89,8 @@ module.exports = class {
                         profile: session.profile,
                         host: room.host.id
                     });
+
+                    broadcastToListeners(this.server);
                 }
                 break;
             case "room.join":
@@ -128,6 +145,13 @@ module.exports = class {
                 session.room.state = "playing";
 
                 session.room.broadcast("room.start");
+                broadcastToListeners(this.server);
+                break;
+            case "room.public.listen":
+                session.state = "room.public.listen";
+
+                broadcastToListeners(this.server);
+                break;
         }
     }
 };
