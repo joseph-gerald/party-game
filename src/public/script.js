@@ -1,7 +1,13 @@
-const isLocalhost = window.location.host.indexOf("localhost") == 0;
+const isLocalhost = window.location.host.indexOf("localhost") == 0 || window.location.host.indexOf('127.0.0.1') == 0;
 const protocol = isLocalhost ? "ws://" : "wss://";
 
 const socket = new WebSocket(protocol + window.location.host);
+
+if(isLocalhost) {
+    let urlParams = new URLSearchParams(window.location.search);
+
+    var skipAnimations = urlParams.get('skipanimations') == 1;
+}
 
 const sleep = ms => new Promise(r => setTimeout(r, ms));
 
