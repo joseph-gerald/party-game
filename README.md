@@ -50,11 +50,15 @@
 
 ### Setting up a Workspace
 ![image](https://github.com/joseph-gerald/party-game/assets/73967013/587d509d-5d1b-4b43-bfb1-c755c5b32670)
+**Local Workspace**
 ```console
 $ git clone https://github.com/joseph-gerald/party-game
 $ npm i
 $ npm run dev
 ```
+**GitHub Codespace**
+<br>
+[![Open in GitHub Codespaces](https://github.com/codespaces/badge.svg)](https://codespaces.new/joseph-gerald/party-game)
 
 <br>
 <br>
