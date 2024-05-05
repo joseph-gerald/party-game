@@ -32,6 +32,7 @@
 - [ ] 🥷🏿 Parkour/Obby
 - [ ] 🧱 Stacking Game
 - [ ] 🎶 Music Geussing
+- [ ] 🎶 Song Describe
 - [ ] 🗳️ Voting Game
 - [ ] ⚖️ Prisoners Dilemma
 <br>
