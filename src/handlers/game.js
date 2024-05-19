@@ -1,12 +1,10 @@
 const handled_types = ["game.ready", "game.wheel.ready", "game.leaderboard.ready"]
 const [
     CometDodge,
-    HotPotato,
     Trivia,
     PrisonersDilemma
 ] = [
         require('./games/cometDodge.js'),
-        require('./games/hotPotato.js'),
         require('./games/trivia.js'),
         require('./games/prisonersDilemma.js'),
     ];
@@ -16,13 +14,6 @@ module.exports = class {
         this.server = server;
 
         this.games = [
-                {
-                    image: "assets/games/hot_potato.webp",
-                    name: "Hot Potato",
-                    type: "individual",
-                    screen: "hot_potato",
-                    handler: new HotPotato(server)
-                },
                 {
                     image: "assets/games/comet_dodge.webp",
                     name: "Comet Dodge",

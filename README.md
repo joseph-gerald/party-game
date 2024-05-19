@@ -26,7 +26,6 @@
 - [ ] 📖 Trivia
 - [ ] 🧠 Memory Game
 - [ ] 🖱️ Clicking (e.g Tug of war) / Timing games (e.g wack a mole)
-- [x] 💣 Hot Potato (90%)
 - [ ] 🤏 Sorting Game
 - [x] ☄️ Comet Dodge
 - [ ] 🥷🏿 Parkour/Obby
