@@ -5,6 +5,7 @@
 <script>
     const originalHandlers = connection.events.handlers;
     const grid = document.getElementById("comet-dodge-grid");
+    let comets = [];
 
     player.game = { x: 0, y: 0 };
 
@@ -86,13 +87,9 @@
 
         matchedCells.forEach(cell => {
             cell.style.backgroundColor = "rgba(255,100,100,0.5)";
-
-            setTimeout(() => {
-                cell.style.backgroundColor = "transparent";
-            }, timeout - 350);
         });
 
-        setTimeout(() => {
+        const fn = () => {
             const comet = summonComet();
 
             comet.style.scale = "1.1";
@@ -111,6 +108,10 @@
                 comet.style.translate = right ? "5% 0" : "-5% 0";
             }
 
+            matchedCells.forEach(cell => {
+                cell.style.backgroundColor = "transparent";
+            });
+
             setTimeout(() => {
                 if (isRow) {
                     comet.style.left = right ? "100%" : "-10%";
@@ -122,7 +123,19 @@
                     comet.remove();
                 }, cometSpeed);
             }, 10);
-        }, timeout);
+        }
+
+        comets.push({
+            tm: setTimeout(fn, timeout),
+            fn
+        });
+    }
+
+    function onSkip() {
+        for (const comet of comets) {
+            clearTimeout(comet.tm);
+            comet.fn();
+        }
     }
 
     function keyDown(e) {
@@ -170,6 +183,8 @@
     }
 
     function onComet(cometArray) {
+        comets = [];
+
         for (const data of cometArray) {
             const { index, prep, direction } = data;
             comet(index, prep, direction % 2 == 0 ? "right" : "", direction > 1);
@@ -194,8 +209,9 @@
         [
             onPlayerMove,
             onComet,
+            onSkip,
             onHit,
-            onEnd
+            onEnd,
         ].forEach(handler => {
             connection.events.remove(handler);
         });
@@ -216,6 +232,7 @@
 
     connection.events.on("comet_dodge.move", onPlayerMove);
     connection.events.on("comet_dodge.comet", onComet);
+    connection.events.on("comet_dodge.skip", onSkip);
     connection.events.on("comet_dodge.hit", onHit);
     connection.events.on("comet_dodge.end", onEnd);
 </script>
