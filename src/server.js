@@ -28,7 +28,7 @@ function encode(string) {
 }
 
 function decode(string) {
-    return decodeURI(atob(string));
+    return atob(decodeURI(string));
 }
 
 class Session {
@@ -136,7 +136,7 @@ function handleConnection(client, request) {
             session.send("error", {
                 title: "Decoder Error",
                 message: "Something went wrong when decoding your message. Please report DE01/400."
-            })
+            });
         }
     }
 
