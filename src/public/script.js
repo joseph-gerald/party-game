@@ -1,5 +1,5 @@
 const isLocalhost = window.location.host.indexOf("localhost") == 0 || window.location.host.indexOf('127.0.0.1') == 0;
-const protocol = isLocalhost ? "ws://" : "wss://";
+const protocol = location.protocol == "http:" ? "ws://" : "wss://";
 
 const socket = new WebSocket(protocol + window.location.host);
 
