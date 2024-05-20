@@ -83,7 +83,7 @@ module.exports = class {
                     if (client.gameReady != 2) return;
                 }
 
-                const index = 0; // || Math.floor(Math.random() * this.games.length);
+                const index = 1; // || Math.floor(Math.random() * this.games.length);
                 const game = this.games[index];
                 game.data = null;
 
