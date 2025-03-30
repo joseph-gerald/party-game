@@ -1,7 +1,7 @@
 ![banner](https://github.com/joseph-gerald/party-game/assets/73967013/71fc022f-b4bc-477a-9813-fbfbbd275728)
 
 <p align="center">
-  <a href="https://party-ga.me/">
+  <a href="https://pg.jooo.tech/">
     <strong>Demo ✨</strong>
   </a>
   •
